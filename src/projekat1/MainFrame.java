@@ -78,20 +78,19 @@ public class MainFrame extends GameFrame {
 	public void render(Graphics2D arg0, int arg1, int arg2) {
 		arg0.setColor(Color.BLUE);
 		BufferedImage image = makeRaster();
-		int x = (sirinaEkrana - image.getWidth(null)) / 2;
-		int y = (visinaEkrana - image.getHeight(null)) / 2;
+		int x = (sirinaEkrana - 600) / 2;
+		int y = (visinaEkrana - 600) / 2;
 		arg0.drawImage(image, x, y, null);
 	}
 
 	@Override
 	public void update() {
-		if (isKeyDown(KeyEvent.VK_DOWN))
-			System.out.println("Da jeste");
-		;
 	}
 
 	public BufferedImage makeRaster() {
 		WritableRaster raster = Util.createRaster(600, 600, false);
+		BufferedImage image = Util.loadImage("slika.png");
+		WritableRaster source = image.getRaster();
 		int[] rgb = new int[3];
 
 		rgb[0] = 255;
@@ -105,6 +104,7 @@ public class MainFrame extends GameFrame {
 			int kordY = koordinata.y;
 			for (int y = kordY; y < kordY + 150; y++) {
 				for (int x = kordX; x < kordX + 150; x++) {
+					source.getPixel(x-kordX, y-kordY, rgb);
 					raster.setPixel(x, y, rgb);
 				}
 			}
