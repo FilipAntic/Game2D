@@ -1,14 +1,11 @@
 package projekat1;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.Random;
-
-import javax.swing.Timer;
 
 import rafgfxlib.GameFrame;
 import rafgfxlib.Util;
@@ -58,7 +55,13 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void handleMouseMove(int arg0, int arg1) {
-
+		int x = arg0 - ((sirinaEkrana - 600) / 2);
+		int y = arg1 - ((visinaEkrana - 600) / 2);
+		if (x >= 0 && x < 600 && y >= 0 && y < 600) {
+			setCursor(new Cursor(Cursor.HAND_CURSOR));
+		} else {
+			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
 	}
 
 	@Override
