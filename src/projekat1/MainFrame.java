@@ -109,6 +109,8 @@ public class MainFrame extends GameFrame {
 		int x = (sirinaEkrana - 600) / 2;
 		int y = (visinaEkrana - 600) / 2;
 		arg0.drawImage(image, x, y, null);
+		arg0.drawImage(Ilustrator.noiseGenerator(), 0, 0, this);
+		
 	}
 
 	@Override
