@@ -2,13 +2,9 @@ package projekat1;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.awt.image.WritableRaster;
-import java.awt.image.renderable.RenderableImage;
 import java.util.ArrayList;
 import java.util.Random;
 
