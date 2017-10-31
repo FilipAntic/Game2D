@@ -57,6 +57,7 @@ public class Ilustrator {
 				for(int y = 0; y < octaveSize; ++y)
 				{
 					octaveMap[x][y] = ((float)Math.random() - 0.5f) * 2.0f;
+					
 				}
 			}
 			
