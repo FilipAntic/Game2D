@@ -2,7 +2,6 @@ package projekat1;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.Random;
 
 import rafgfxlib.Util;
 
