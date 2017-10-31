@@ -2,6 +2,7 @@ package projekat1;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import rafgfxlib.GameFrame;
+import rafgfxlib.ImageViewer;
 import rafgfxlib.Util;
 
 public class MainFrame extends GameFrame {
@@ -36,12 +38,13 @@ public class MainFrame extends GameFrame {
 	}
 
 	public static void main(String[] args) {
-		// new MainFrame().initGameWindow();
+		 new MainFrame().initGameWindow();
 		generateImages();
 		dynamicMemoryMatrix();
 
 	}
-
+	
+	
 	@Override
 	public void handleKeyDown(int arg0) {
 		// TODO Auto-generated method stub
@@ -108,9 +111,8 @@ public class MainFrame extends GameFrame {
 	public void render(Graphics2D arg0, int arg1, int arg2) {
 		int x = (sirinaEkrana - 600) / 2;
 		int y = (visinaEkrana - 600) / 2;
+		arg0.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
 		arg0.drawImage(image, x, y, null);
-		arg0.drawImage(Ilustrator.noiseGenerator(), 0, 0, this);
-		
 	}
 
 	@Override
