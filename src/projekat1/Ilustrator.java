@@ -1,5 +1,6 @@
 package projekat1;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -12,9 +13,21 @@ import rafgfxlib.Util;
 public class Ilustrator {
 	
 	
-	private static BufferedImage image; 
-	private static Random random;
-	
+//	private static BufferedImage image = new BufferedImage(MainFrame.WIDTH,MainFrame.HEIGHT, BufferedImage.TYPE_INT_RGB);
+//	private static Random random = new Random();
+//	
+//	public static BufferedImage noiseGenerator(){
+//		 
+//		 
+//	    	for(int y = 0; y < MainFrame.WIDTH; y++){
+//	    		System.out.println("tu si 1");
+//	    		for(int x = 0; x < MainFrame.HEIGHT; x++){
+//	        		image.setRGB(x, y, random.nextInt(0xFFFFFF));
+//	        		System.out.println("tu si 2");
+//	        	}
+//	    	}
+//			return image;
+//	    }
 	
 	
 	public static BufferedImage noiseGenerator(){
@@ -75,13 +88,6 @@ public class Ilustrator {
 		
 	}
 
-	public static BufferedImage getImage() {
-		return image;
-	}
-
-	public static void setImage(BufferedImage image) {
-		Ilustrator.image = image;
-	}
 	
 	
 

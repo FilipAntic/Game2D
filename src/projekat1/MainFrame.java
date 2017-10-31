@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.WritableRaster;
+import java.awt.image.renderable.RenderableImage;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,7 +17,7 @@ import rafgfxlib.ImageViewer;
 import rafgfxlib.Util;
 
 public class MainFrame extends GameFrame {
-
+	
 	final int[] ints = new Random().ints(0, 6).distinct().limit(6).toArray();
 	WritableRaster raster = Util.createRaster(600, 600, false);
 	int sirinaEkrana = getWidth();
@@ -43,6 +46,7 @@ public class MainFrame extends GameFrame {
 		dynamicMemoryMatrix();
 
 	}
+	
 	
 	
 	@Override
@@ -108,11 +112,13 @@ public class MainFrame extends GameFrame {
 	}
 
 	@Override
-	public void render(Graphics2D arg0, int arg1, int arg2) {
+	public void render(Graphics2D g, int arg1, int arg2) {
 		int x = (sirinaEkrana - 600) / 2;
 		int y = (visinaEkrana - 600) / 2;
-		arg0.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-		arg0.drawImage(image, x, y, null);
+		g.drawImage(Ilustrator.noiseGenerator(),0,0,null);
+		g.drawImage(image, x, y, null);
+		System.out.println("ssss");
+		
 	}
 
 	@Override
@@ -162,7 +168,8 @@ public class MainFrame extends GameFrame {
 		}
 
 		for (MemoryImage m : orderedImages) {
-			System.out.println(m.getName());
+//			System.out.println(m.getName());
 		}
 	}
+	
 }
