@@ -5,6 +5,7 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
 import java.util.Random;
 
 import rafgfxlib.GameFrame;
@@ -18,6 +19,10 @@ public class MainFrame extends GameFrame {
 	BufferedImage image;
 	int visinaEkrana = getHeight();
 	boolean first = true;
+	static ArrayList<MemoryImage> imagesInGame = new ArrayList<>();
+	static ArrayList<MemoryImage> orderedImages = new ArrayList<>();
+	static String[] images = { "crocodile.jpg", "eagle.jpg", "elephant.jpg", "fish.jpg", "giraffe.jpg", "lion.jpg",
+			"monkey.jpeg", "snake.jpg" };
 	Koordinate[] cords = { new Koordinate(0, 0), new Koordinate(150, 0), new Koordinate(300, 0), new Koordinate(450, 0),
 			new Koordinate(0, 150), new Koordinate(150, 150), new Koordinate(300, 150), new Koordinate(450, 150),
 			new Koordinate(0, 300), new Koordinate(150, 300), new Koordinate(300, 300), new Koordinate(450, 300),
@@ -31,7 +36,9 @@ public class MainFrame extends GameFrame {
 	}
 
 	public static void main(String[] args) {
-		new MainFrame().initGameWindow();
+		// new MainFrame().initGameWindow();
+		generateImages();
+		dynamicMemoryMatrix();
 
 	}
 
@@ -133,5 +140,25 @@ public class MainFrame extends GameFrame {
 		}
 
 		return Util.rasterToImage(raster);
+	}
+
+	public static void generateImages() {
+		for (int i = 0; i < images.length; i++) {
+			String imgName = images[i];
+			String[] parts = imgName.split("\\.");
+			imagesInGame.add(new MemoryImage(parts[0], imgName));
+			imagesInGame.add(new MemoryImage(parts[0], imgName));
+		}
+	}
+
+	public static void dynamicMemoryMatrix() {
+		int[] randomImages = new Random().ints(0, 16).distinct().limit(16).toArray();
+		for (int i = 0; i < randomImages.length; i++) {
+			orderedImages.add(imagesInGame.get(randomImages[i]));
+		}
+
+		for (MemoryImage m : orderedImages) {
+			System.out.println(m.getName());
+		}
 	}
 }
