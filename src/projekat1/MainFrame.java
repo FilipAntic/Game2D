@@ -2,18 +2,13 @@ package projekat1;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.awt.image.WritableRaster;
-import java.awt.image.renderable.RenderableImage;
 import java.util.ArrayList;
 import java.util.Random;
 
 import rafgfxlib.GameFrame;
-import rafgfxlib.ImageViewer;
 import rafgfxlib.Util;
 
 public class MainFrame extends GameFrame {
@@ -117,7 +112,6 @@ public class MainFrame extends GameFrame {
 		int y = (visinaEkrana - 600) / 2;
 		g.drawImage(Ilustrator.noiseGenerator(),0,0,null);
 		g.drawImage(image, x, y, null);
-		System.out.println("ssss");
 		
 	}
 
