@@ -1,12 +1,8 @@
 package projekat1;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.Random;
 
-import rafgfxlib.ImageViewer;
 import rafgfxlib.Util;
 
 
@@ -80,14 +76,7 @@ public class Ilustrator {
 		
 		
 	}
-		
-	public static int randomColor(){
-		
-		Random random = new Random();
-		
-		return random.nextInt(256);
-		
-	}
+	
 
 	
 	
