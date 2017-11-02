@@ -4,14 +4,12 @@ public class MemoryImage {
 
 	private String name;
 	private String path;
-	private int x;
-	private int y;
+	private Koordinate koordinate;
 
-	public MemoryImage(String name, String path, int x, int y) {
+	public MemoryImage(String name, String path, Koordinate koordinate) {
 		this.name = name;
 		this.path = path;
-		this.x = x;
-		this.y = y;
+		this.koordinate = koordinate;
 	}
 
 	public MemoryImage() {
@@ -19,7 +17,6 @@ public class MemoryImage {
 	}
 
 	public MemoryImage(String name, String path) {
-		super();
 		this.name = name;
 		this.path = path;
 	}
@@ -40,20 +37,18 @@ public class MemoryImage {
 		this.path = path;
 	}
 
-	public int getX() {
-		return x;
+	public Koordinate getKoordinate() {
+		return koordinate;
 	}
 
-	public void setX(int x) {
-		this.x = x;
+	public void setKoordinate(Koordinate koordinate) {
+		this.koordinate = koordinate;
 	}
 
-	public int getY() {
-		return y;
+	@Override
+	public String toString() {
+		return "MemoryImage [name=" + name + ", path=" + path + ", koordinate=" + koordinate + "]";
 	}
 
-	public void setY(int y) {
-		this.y = y;
-	}
-
+	
 }

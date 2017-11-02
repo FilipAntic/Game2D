@@ -27,4 +27,9 @@ public class Koordinate {
 		this.y = y;
 	}
 
+	@Override
+	public String toString() {
+		return "Koordinate [x=" + x + ", y=" + y + "]";
+	}
+
 }
