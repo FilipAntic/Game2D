@@ -95,12 +95,14 @@ public class MainFrame extends GameFrame {
 
 			for (MemoryImage m : orderedImages) {
 				Koordinate k = m.getKoordinate();
-				
+
 				if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
 					try {
-						
-						if ((k.getX()==drugaOtvorenaSlika.getKoordinate().getX() && k.getY()==drugaOtvorenaSlika.getKoordinate().getY()) || (k.getX()==prvaOtvorenaSlika.getKoordinate().getX() && k.getY()==prvaOtvorenaSlika.getKoordinate().getY())) {
-							System.out.println("Udjoh ovde");
+						if ((k.getX() == prvaOtvorenaSlika.getKoordinate().getX()
+								&& k.getY() == prvaOtvorenaSlika.getKoordinate().getY())
+								|| (k.getX() == drugaOtvorenaSlika.getKoordinate().getX()
+										&& k.getY() == drugaOtvorenaSlika.getKoordinate().getY())) {
+							System.out.println("Odabrana je ista slika");
 							return;
 						}
 						System.out.println(prvaOtvorenaSlika);
