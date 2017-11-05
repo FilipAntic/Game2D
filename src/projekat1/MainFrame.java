@@ -24,15 +24,27 @@ public class MainFrame extends GameFrame {
 	BufferedImage snakeImage = Util.loadImage("snake.jpg");
 	BufferedImage moneyImage = Util.loadImage("money.jpg");
 	WritableRaster source = null;
+	int fallx = 600;
+	int fallY = 150;
+	int fall = 0;
+	int p = 150;
+	int q = 400;
 	boolean pogodjenPar = false;
+	int countPogodjenPar = 0;
+	int snoozingColor = 0;
 	final int[] ints = new Random().ints(0, 6).distinct().limit(6).toArray();
 	WritableRaster raster = Util.createRaster(600, 600, false);
 	int sirinaEkrana = getWidth();
 	BufferedImage image;
+	int color = 0;
 	int visinaEkrana = getHeight();
 	boolean first = true;
+	boolean isFinishedGame = false;
 	MemoryImage prvaOtvorenaSlika = null;
+	int prvaOtvorenaSlikaInt = 0;
+	boolean isFalling = true;
 	MemoryImage drugaOtvorenaSlika = null;
+	int drugaOtvorenaSlikaInt = 0;
 	int otvoreneSlike = 0;
 	static ArrayList<MemoryImage> imagesInGame = new ArrayList<>();
 	static ArrayList<MemoryImage> orderedImages = new ArrayList<>();
@@ -78,12 +90,16 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void handleMouseMove(int arg0, int arg1) {
-		int x = arg0 - ((sirinaEkrana - 600) / 2);
-		int y = arg1 - ((visinaEkrana - 600) / 2);
-		if (x >= 0 && x < 600 && y >= 0 && y < 600) {
-			setCursor(new Cursor(Cursor.HAND_CURSOR));
-		} else {
+		if (isFinishedGame) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		} else {
+			int x = arg0 - ((sirinaEkrana - 600) / 2);
+			int y = arg1 - ((visinaEkrana - 600) / 2);
+			if (x >= 0 && x < 600 && y >= 0 && y < 600) {
+				setCursor(new Cursor(Cursor.HAND_CURSOR));
+			} else {
+				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
 		}
 	}
 
@@ -92,21 +108,22 @@ public class MainFrame extends GameFrame {
 		int x = arg0 - ((sirinaEkrana - 600) / 2);
 		int y = arg1 - ((visinaEkrana - 600) / 2);
 		if (x >= 0 && x < 600 && y >= 0 && y < 600) {
-
+			int count = 0;
 			for (MemoryImage m : orderedImages) {
 				Koordinate k = m.getKoordinate();
-				
 				if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
+					if (m.isOpened()) {
+						return;
+					}
 					try {
-						
-						if ((k.getX()==drugaOtvorenaSlika.getKoordinate().getX() && k.getY()==drugaOtvorenaSlika.getKoordinate().getY()) || (k.getX()==prvaOtvorenaSlika.getKoordinate().getX() && k.getY()==prvaOtvorenaSlika.getKoordinate().getY())) {
-							System.out.println("Udjoh ovde");
+						if ((k.getX() == prvaOtvorenaSlika.getKoordinate().getX()
+								&& k.getY() == prvaOtvorenaSlika.getKoordinate().getY())
+								|| (k.getX() == drugaOtvorenaSlika.getKoordinate().getX()
+										&& k.getY() == drugaOtvorenaSlika.getKoordinate().getY())) {
+							System.err.println("Odabrana je ista slika");
 							return;
 						}
-						System.out.println(prvaOtvorenaSlika);
-						System.out.println(drugaOtvorenaSlika);
 					} catch (Exception e) {
-						// TODO: handle exception
 					}
 					otvoreneSlike++;
 					if (otvoreneSlike == 3) {
@@ -115,6 +132,8 @@ public class MainFrame extends GameFrame {
 									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
 									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
+							orderedImages.get(prvaOtvorenaSlikaInt).setOpened(true);
+							orderedImages.get(drugaOtvorenaSlikaInt).setOpened(true);
 							pogodjenPar = false;
 						} else {
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
@@ -124,24 +143,37 @@ public class MainFrame extends GameFrame {
 						}
 
 						prvaOtvorenaSlika = m;
+						prvaOtvorenaSlikaInt = count;
 						drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
 								prvaOtvorenaSlika.getKoordinate().getY(), "rgb", prvaOtvorenaSlika.getName());
 						drugaOtvorenaSlika = null;
 						otvoreneSlike = 1;
 					} else if (otvoreneSlike == 1) {
 						prvaOtvorenaSlika = m;
+						prvaOtvorenaSlikaInt = count;
 						drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
 								prvaOtvorenaSlika.getKoordinate().getY(), "rgb", prvaOtvorenaSlika.getName());
 					} else if (otvoreneSlike == 2) {
 						drugaOtvorenaSlika = m;
+						drugaOtvorenaSlikaInt = count;
 						drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
 								drugaOtvorenaSlika.getKoordinate().getY(), "rgb", drugaOtvorenaSlika.getName());
 						if (drugaOtvorenaSlika.getName().equals(prvaOtvorenaSlika.getName())) {
 							pogodjenPar = true;
+							countPogodjenPar++;
+						}
+						if (countPogodjenPar == 8) {
+							System.out.println("Presao si igricu matori");
+							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
+									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
+							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
+									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
+							isFinishedGame = true;
 						}
 					}
 					break;
 				}
+				count++;
 			}
 			image = Util.rasterToImage(raster);
 		}
@@ -161,15 +193,111 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void render(Graphics2D g, int arg1, int arg2) {
-		int x = (sirinaEkrana - 600) / 2;
-		int y = (visinaEkrana - 600) / 2;
-		g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-		g.drawImage(image, x, y, null);
-
+		//
+		// if (isFinishedGame) {
+		// if (snoozingColor == 21) {
+		// snoozingColor = 1;
+		// }
+		// if (snoozingColor % 20 == 0) {
+		// color++;
+		// }
+		// if (color == 6) {
+		// color = 0;
+		// }
+		// g.setColor(colors[color]);
+		// g.setFont(new Font("Verdana", Font.BOLD, 110));
+		// g.drawString("Cestitamo!", p, q);
+		// snoozingColor++;
+		// } else {
+		// int x = (sirinaEkrana - 600) / 2;
+		// int y = (visinaEkrana - 600) / 2;
+		//
+		// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+		// g.drawImage(image, x, y, null);
+		// }
+		// int p = 300;
+		// int q = 300;
+		// System.out.println(fall);
+		// if (fall > 0 && fall < 30) {
+		// g.drawImage(lionImage, p, q, null);
+		// } else if (fall > 30 && fall < 50) {
+		// g.drawImage(lionImage, p - 30, q + 30, null);
+		// } else if (fall > 50 && fall < 70) {
+		// g.drawImage(lionImage, p - 60, q + 60, null);
+		// } else if (fall > 70 && fall < 80) {
+		// g.drawImage(lionImage, p - 90, q + 90, null);
+		// } else if (fall > 80 && fall < 90) {
+		// g.drawImage(lionImage, p - 120, q + 120, null);
+		// } else if (fall > 90 && fall < 3000) {
+		// g.drawImage(lionImage, p - 120 - 30, q + 120 - 30, null);
+		// }
+		g.drawImage(lionImage, fallx, fallY, null);
+		//
+		// try {
+		// Thread.sleep(200);
+		// g.clearRect(p, q, 150, 150);
+		//
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// g.drawImage(lionImage, p - 30, q + 30, null);
+		// try {
+		// Thread.sleep(200);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// g.drawImage(lionImage, p - 60, q + 60, null);
+		// try {
+		// Thread.sleep(200);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// g.drawImage(lionImage, p - 90, q + 90, null);
+		// try {
+		// Thread.sleep(200);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// g.drawImage(lionImage, p - 120, q + 120, null);
+		fall++;
+		if (fall > 3000) {
+			fall = 0;
+		}
 	}
 
 	@Override
 	public void update() {
+		if(fallx==0){
+			return;
+		}
+		if (isFalling) {
+			fallY *= 1.02f;
+		} else {
+			if (fallY < 450) {
+				isFalling = true;
+			}
+			fallY *= 0.99f;
+		}
+		fallx *= 0.99f;
+		if (fallx > getWidth()) {
+			fallx = 150;
+		}
+		if (fallY > getHeight()) {
+			// fallY = 0;
+			isFalling = false;
+		}
+	}
+
+	public void sleep(int sleep) {
+		try {
+			Thread.sleep(sleep);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public BufferedImage makeRaster() {
