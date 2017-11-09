@@ -14,19 +14,25 @@ import rafgfxlib.Util;
 
 public class MainFrame extends GameFrame {
 
-	BufferedImage coverImage = Util.loadImage("slika.png");
-	BufferedImage crocodileImage = Util.loadImage("crocodile.jpg");
-	BufferedImage eagleImage = Util.loadImage("eagle.jpg");
-	BufferedImage elephantImage = Util.loadImage("elephant.jpg");
-	BufferedImage fishImage = Util.loadImage("fish.jpg");
-	BufferedImage giraffeImage = Util.loadImage("giraffe.jpg");
-	BufferedImage lionImage = Util.loadImage("lion.jpg");
-	BufferedImage monkeyImage = Util.loadImage("monkey.jpeg");
-	BufferedImage snakeImage = Util.loadImage("snake.jpg");
-	BufferedImage moneyImage = Util.loadImage("money.jpg");
-	WritableRaster source = null;
+	BufferedImage coverImage = loadImage("slika.png");
+	BufferedImage crocodileImage = loadImage("crocodile.jpg");
+	BufferedImage eagleImage = loadImage("eagle.jpg");
+	BufferedImage elephantImage = loadImage("elephant.jpg");
+	BufferedImage fishImage = loadImage("fish.jpg");
+	BufferedImage giraffeImage = loadImage("giraffe.jpg");
+	BufferedImage lionImage = loadImage("lion.jpg");
+	BufferedImage monkeyImage = loadImage("monkey.jpeg");
+	BufferedImage snakeImage = loadImage("snake.jpg");
+	BufferedImage moneyImage = loadImage("money.jpg");
+	double airDrag = 0.99;
+	double groundFriction = 0.98;
+	double vx = Math.random() * 50;
+	double vy = 0;
+	double elasticity = 0.8;
+	double gravity = 0.98;
 	int fallx = 600;
 	int fallY = 150;
+	WritableRaster source = null;
 	int fall = 0;
 	int p = 150;
 	int q = 400;
@@ -114,9 +120,10 @@ public class MainFrame extends GameFrame {
 				Koordinate k = m.getKoordinate();
 				if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
 					// Ilustrator.bilinearSize();
-					drawSpecificCords(k.getX() - 25, k.getY() - 25, "resized", "slika");
-					image = Util.rasterToImage(raster);
-					sleep(1000);
+					// drawSpecificCords(k.getX() - 25, k.getY() - 25,
+					// "resized", "slika");
+					// image = Util.rasterToImage(raster);
+					// sleep(1000);
 					if (m.isOpened()) {
 						return;
 					}
@@ -199,56 +206,37 @@ public class MainFrame extends GameFrame {
 	@Override
 	public void render(Graphics2D g, int arg1, int arg2) {
 		// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-		
-		if (isFinishedGame) {
-			if (snoozingColor == 21) {
-				snoozingColor = 1;
-			}
-			if (snoozingColor % 20 == 0) {
-				color++;
-			}
-			if (color == 6) {
-				color = 0;
-			}
-			g.setColor(colors[color]);
-			g.setFont(new Font("Verdana", Font.BOLD, 110));
-			g.drawString("Cestitamo!", p, q);
-			snoozingColor++;
-		}
-		else {
-			int x = (sirinaEkrana - 600) / 2;
-			int y = (visinaEkrana - 600) / 2;
-
-			g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-			g.drawImage(image, x, y, null);
-		}
-		if (getCursor().getType() == Cursor.HAND_CURSOR) {
-			g.drawImage(Ilustrator.blurGenerator(), 0, 0, null);
-		}
-		// g.drawImage(lionImage, fallx, fallY, null);
+//
+//		if (isFinishedGame) {
+//			if (snoozingColor == 21) {
+//				snoozingColor = 1;
+//			}
+//			if (snoozingColor % 20 == 0) {
+//				color++;
+//			}
+//			if (color == 6) {
+//				color = 0;
+//			}
+//			g.setColor(colors[color]);
+//			g.setFont(new Font("Verdana", Font.BOLD, 110));
+//			g.drawString("Cestitamo!", p, q);
+//			snoozingColor++;
+//		} else {
+//			int x = (sirinaEkrana - 600) / 2;
+//			int y = (visinaEkrana - 600) / 2;
+//
+//			g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+//			g.drawImage(image, x, y, null);
+//		}
+//		if (getCursor().getType() == Cursor.HAND_CURSOR) {
+//			g.drawImage(Ilustrator.blurGenerator(), 0, 0, null);
+//		}
+		 g.drawImage(lionImage, fallx, fallY, null);
 	}
 
 	@Override
 	public void update() {
-		if (fallx == 0) {
-			return;
-		}
-		if (isFalling) {
-			fallY *= 1.02f;
-		} else {
-			if (fallY < 450) {
-				isFalling = true;
-			}
-			fallY *= 0.99f;
-		}
-		fallx *= 0.99f;
-		if (fallx > getWidth()) {
-			fallx = 150;
-		}
-		if (fallY > getHeight()) {
-			// fallY = 0;
-			isFalling = false;
-		}
+		bouncingImage();
 	}
 
 	public void sleep(int sleep) {
@@ -364,4 +352,38 @@ public class MainFrame extends GameFrame {
 
 	}
 
+	public BufferedImage loadImage(String imageName) {
+
+		return Ilustrator.resizeImage(Util.loadImage(imageName));
+	}
+
+	public void bouncingImage() {
+		fallx += vx;
+		fallY += vy;
+
+		// bounce Y (don't bounce on top)
+		if (fallY >= getHeight() - 150) {
+			fallY = getHeight() - 150; // (!) GROUND LIMIT
+			vy = -(vy * elasticity);
+		}
+
+		// bounce X
+		if ((fallx >= getWidth() - 150) || (fallx <= 0 )) {
+
+			fallx = (fallx < (0 + 150) ? (0) : (getWidth() - 150)); // (!)
+																			// WALLS
+																			// LIMIT
+			vx = -(vx * elasticity);
+		}
+
+		// compute gravity
+		vy += gravity;
+
+		// compute frictions
+		vx *= airDrag;
+		vy *= airDrag;
+		if (fallY >= (getHeight() - 150)) { // grounded
+			vx *= groundFriction;
+		}
+	}
 }
