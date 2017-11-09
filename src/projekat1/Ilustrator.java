@@ -3,10 +3,15 @@ package projekat1;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
+import rafgfxlib.ImageViewer;
 import rafgfxlib.Util;
 
 
 public class Ilustrator {
+	
+	private static BufferedImage blurImage = Util.loadImage("slika.png");
+	private static WritableRaster source = blurImage.getRaster();
+	private static WritableRaster target = Util.createRaster(blurImage.getWidth(), blurImage.getHeight(), false);
 	
 	
 //	private static BufferedImage image = new BufferedImage(MainFrame.WIDTH,MainFrame.HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -77,8 +82,88 @@ public class Ilustrator {
 		
 	}
 	
-
+	public static BufferedImage blurGenerator() {
+		int rgb[] = new int[3];
+		
+		float power = 8.0f;
+		float size = 0.8f;
+		for(int y = 0; y < blurImage.getHeight(); y++)
+		{			
+			for(int x = 0; x < blurImage.getWidth(); x++)
+			{
+				float srcX = (float)(x + Math.sin(y * size) * power);
+				float srcY = (float)(y + Math.cos(x * size) * power);
+				power =8.0f + 0.1f;
+				Util.bilSample(source, srcX, srcY, rgb);
+				target.setPixel(x, y, rgb);
+			}
+		}
+		return Util.rasterToImage(target);
+	}
 	
-	
+	public static void bilinearSample(WritableRaster src, float u, float v, int[] color) {
+		
+		int width = src.getWidth();
+		int height = src.getHeight();
+		
+		//u = Util.clamp(u - 0.5f, 0.0f, width - 1.0f);
+		//v = Util.clamp(v - 0.5f, 0.0f, height - 1.0f);
+		
+		int[] UL = new int[3];
+		int[] UR = new int[3];
+		int[] LL = new int[3];
+		int[] LR = new int[3];
 
+		int x0 = (int)u;
+		int y0 = (int)v;
+		int x1 = x0 + 1;
+		int y1 = y0 + 1;
+		
+		if(x1 >= width) x1 = width - 1;
+		if(y1 >= height) y1 = height - 1;
+		
+		float fX = u - x0;
+		float fY = v - y0;
+		
+		src.getPixel(x0, y0, UL);
+		src.getPixel(x1, y0, UR);
+		src.getPixel(x0, y1, LL);
+		src.getPixel(x1, y1, LR);
+		
+		int[] a = new int[3];
+		int[] b = new int[3];
+		
+		Util.lerpRGBi(UL, UR, fX, a);
+		Util.lerpRGBi(LL, LR, fX, b);
+		Util.lerpRGBi(a, b, fY, color);
+	}
+	
+	public static BufferedImage bilinearSize() {
+		
+		int scaleW = 200;
+		int scaleH = 200;
+		
+		WritableRaster resultBilinear = Util.createRaster(scaleW, scaleH, false);
+		
+		int rgb[] = new int[3];
+		
+		for(int y = 0; y < scaleW; y++)
+		{
+			float fy = (float)y / scaleW;
+			for(int x = 0; x < scaleH; x++)
+			{
+				float fx = (float)x / scaleH;
+				
+				float srcX = fx * source.getWidth();
+				float srcY = fy * source.getHeight();
+				
+				bilinearSample(source, srcX, srcY, rgb);
+				resultBilinear.setPixel(x, y, rgb);
+			}
+		}
+		
+		return Util.rasterToImage(resultBilinear);
+	}
+		
+		
 }

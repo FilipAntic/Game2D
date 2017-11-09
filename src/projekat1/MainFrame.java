@@ -301,7 +301,6 @@ public class MainFrame extends GameFrame {
 	}
 
 	public BufferedImage makeRaster() {
-
 		int[] rgb = new int[3];
 
 		rgb[0] = 255;
@@ -322,8 +321,7 @@ public class MainFrame extends GameFrame {
 			}
 			j++;
 		}
-
-		return Util.rasterToImage(raster);
+			return Util.rasterToImage(raster);
 	}
 
 	public static void generateImages() {
