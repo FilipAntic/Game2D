@@ -24,10 +24,14 @@ public class MainFrame extends GameFrame {
 	BufferedImage monkeyImage = loadImage("monkey.jpeg");
 	BufferedImage snakeImage = loadImage("snake.jpg");
 	BufferedImage moneyImage = loadImage("money.jpg");
+	int secondFallX = 0;
+	int secondFallY = 0;
 	double airDrag = 0.99;
 	double groundFriction = 0.98;
 	double vx = Math.random() * 50;
 	double vy = 0;
+	double secondvx = Math.random() * 50;
+	double secondvy = 0;
 	double elasticity = 0.8;
 	double gravity = 0.98;
 	int fallx = 600;
@@ -205,33 +209,41 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void render(Graphics2D g, int arg1, int arg2) {
-		// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-//
-//		if (isFinishedGame) {
-//			if (snoozingColor == 21) {
-//				snoozingColor = 1;
-//			}
-//			if (snoozingColor % 20 == 0) {
-//				color++;
-//			}
-//			if (color == 6) {
-//				color = 0;
-//			}
-//			g.setColor(colors[color]);
-//			g.setFont(new Font("Verdana", Font.BOLD, 110));
-//			g.drawString("Cestitamo!", p, q);
-//			snoozingColor++;
-//		} else {
-//			int x = (sirinaEkrana - 600) / 2;
-//			int y = (visinaEkrana - 600) / 2;
-//
-//			g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-//			g.drawImage(image, x, y, null);
-//		}
-//		if (getCursor().getType() == Cursor.HAND_CURSOR) {
-//			g.drawImage(Ilustrator.blurGenerator(), 0, 0, null);
-//		}
-		 g.drawImage(lionImage, fallx, fallY, null);
+		 g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+		
+		 if (isFinishedGame) {
+		 if (snoozingColor == 21) {
+		 snoozingColor = 1;
+		 }
+		 if (snoozingColor % 20 == 0) {
+		 color++;
+		 }
+		 if (color == 6) {
+		 color = 0;
+		 }
+		 g.setColor(colors[color]);
+		 g.setFont(new Font("Verdana", Font.BOLD, 110));
+		 g.drawString("Cestitamo!", p, q);
+		 snoozingColor++;
+		 } else {
+		 int x = (sirinaEkrana - 600) / 2;
+		 int y = (visinaEkrana - 600) / 2;
+		
+		 g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+		 g.drawImage(image, x, y, null);
+		 }
+		 if (getCursor().getType() == Cursor.HAND_CURSOR) {
+		 g.drawImage(Ilustrator.blurGenerator(), 0, 0, null);
+		 }
+		if(pogodjenPar){
+			fallx = prvaOtvorenaSlika.getKoordinate().getX();
+			fallY = prvaOtvorenaSlika.getKoordinate().getY();
+			secondFallX = drugaOtvorenaSlika.getKoordinate().getX();
+			secondFallY = drugaOtvorenaSlika.getKoordinate().getY();
+			g.drawImage(lionImage, fallx, fallY, null);
+			g.drawImage(lionImage, secondFallX, secondFallY, null);
+		}
+		
 	}
 
 	@Override
@@ -368,11 +380,11 @@ public class MainFrame extends GameFrame {
 		}
 
 		// bounce X
-		if ((fallx >= getWidth() - 150) || (fallx <= 0 )) {
+		if ((fallx >= getWidth() - 150) || (fallx <= 0)) {
 
 			fallx = (fallx < (0 + 150) ? (0) : (getWidth() - 150)); // (!)
-																			// WALLS
-																			// LIMIT
+																	// WALLS
+																	// LIMIT
 			vx = -(vx * elasticity);
 		}
 
@@ -384,6 +396,37 @@ public class MainFrame extends GameFrame {
 		vy *= airDrag;
 		if (fallY >= (getHeight() - 150)) { // grounded
 			vx *= groundFriction;
+		}
+
+		// ----------------------------druga
+		// slika----------------------------------------
+
+		secondFallX += secondvx;
+		secondFallY += secondvy;
+
+		// bounce Y (don't bounce on top)
+		if (secondFallY >= getHeight() - 150) {
+			secondFallY = getHeight() - 150; // (!) GROUND LIMIT
+			secondvy = -(secondvy * elasticity);
+		}
+
+		// bounce X
+		if ((secondFallX >= getWidth() - 150) || (secondFallX <= 0)) {
+
+			secondFallX = (secondFallX < (0 + 150) ? (0) : (getWidth() - 150)); // (!)
+			// WALLS
+			// LIMIT
+			secondvx = -(secondvx * elasticity);
+		}
+
+		// compute gravity
+		secondvy += gravity;
+
+		// compute frictions
+		secondvx *= airDrag;
+		secondvy *= airDrag;
+		if (secondFallY >= (getHeight() - 150)) { // grounded
+			secondvx *= groundFriction;
 		}
 	}
 }
