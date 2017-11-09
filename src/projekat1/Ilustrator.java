@@ -12,7 +12,8 @@ public class Ilustrator {
 	private static BufferedImage blurImage = Util.loadImage("slika.png");
 	private static WritableRaster source = blurImage.getRaster();
 	private static WritableRaster target = Util.createRaster(blurImage.getWidth(), blurImage.getHeight(), false);
-	
+	static float power = 8.0f;
+	static float size = 0.8f;
 	
 //	private static BufferedImage image = new BufferedImage(MainFrame.WIDTH,MainFrame.HEIGHT, BufferedImage.TYPE_INT_RGB);
 //	private static Random random = new Random();
@@ -85,19 +86,27 @@ public class Ilustrator {
 	public static BufferedImage blurGenerator() {
 		int rgb[] = new int[3];
 		
-		float power = 8.0f;
-		float size = 0.8f;
+		
 		for(int y = 0; y < blurImage.getHeight(); y++)
 		{			
 			for(int x = 0; x < blurImage.getWidth(); x++)
 			{
 				float srcX = (float)(x + Math.sin(y * size) * power);
 				float srcY = (float)(y + Math.cos(x * size) * power);
-				power =8.0f + 0.1f;
 				Util.bilSample(source, srcX, srcY, rgb);
 				target.setPixel(x, y, rgb);
+				
+			}
+			power = power - 0.001f;
+			size = size - 0.0001f;
+			if(power<7 || size <0.7){
+			power = 8.0f;
+			size= 0.8f;
 			}
 		}
+		System.out.println(power);
+		System.out.println(size);
+		
 		return Util.rasterToImage(target);
 	}
 	

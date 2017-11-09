@@ -113,7 +113,8 @@ public class MainFrame extends GameFrame {
 			for (MemoryImage m : orderedImages) {
 				Koordinate k = m.getKoordinate();
 				if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
-					drawSpecificCords(k.getX()-25, k.getY()-25, "resized", "slika");
+					// Ilustrator.bilinearSize();
+					drawSpecificCords(k.getX() - 25, k.getY() - 25, "resized", "slika");
 					image = Util.rasterToImage(raster);
 					sleep(1000);
 					if (m.isOpened()) {
@@ -197,6 +198,8 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void render(Graphics2D g, int arg1, int arg2) {
+		// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+		
 		if (isFinishedGame) {
 			if (snoozingColor == 21) {
 				snoozingColor = 1;
@@ -211,12 +214,16 @@ public class MainFrame extends GameFrame {
 			g.setFont(new Font("Verdana", Font.BOLD, 110));
 			g.drawString("Cestitamo!", p, q);
 			snoozingColor++;
-		} else {
+		}
+		else {
 			int x = (sirinaEkrana - 600) / 2;
 			int y = (visinaEkrana - 600) / 2;
 
 			g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
 			g.drawImage(image, x, y, null);
+		}
+		if (getCursor().getType() == Cursor.HAND_CURSOR) {
+			g.drawImage(Ilustrator.blurGenerator(), 0, 0, null);
 		}
 		// g.drawImage(lionImage, fallx, fallY, null);
 	}
