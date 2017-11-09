@@ -2,6 +2,7 @@ package projekat1;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -112,6 +113,9 @@ public class MainFrame extends GameFrame {
 			for (MemoryImage m : orderedImages) {
 				Koordinate k = m.getKoordinate();
 				if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
+					drawSpecificCords(k.getX()-25, k.getY()-25, "resized", "slika");
+					image = Util.rasterToImage(raster);
+					sleep(1000);
 					if (m.isOpened()) {
 						return;
 					}
@@ -193,85 +197,33 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void render(Graphics2D g, int arg1, int arg2) {
-		//
-		// if (isFinishedGame) {
-		// if (snoozingColor == 21) {
-		// snoozingColor = 1;
-		// }
-		// if (snoozingColor % 20 == 0) {
-		// color++;
-		// }
-		// if (color == 6) {
-		// color = 0;
-		// }
-		// g.setColor(colors[color]);
-		// g.setFont(new Font("Verdana", Font.BOLD, 110));
-		// g.drawString("Cestitamo!", p, q);
-		// snoozingColor++;
-		// } else {
-		// int x = (sirinaEkrana - 600) / 2;
-		// int y = (visinaEkrana - 600) / 2;
-		//
-		// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-		// g.drawImage(image, x, y, null);
-		// }
-		// int p = 300;
-		// int q = 300;
-		// System.out.println(fall);
-		// if (fall > 0 && fall < 30) {
-		// g.drawImage(lionImage, p, q, null);
-		// } else if (fall > 30 && fall < 50) {
-		// g.drawImage(lionImage, p - 30, q + 30, null);
-		// } else if (fall > 50 && fall < 70) {
-		// g.drawImage(lionImage, p - 60, q + 60, null);
-		// } else if (fall > 70 && fall < 80) {
-		// g.drawImage(lionImage, p - 90, q + 90, null);
-		// } else if (fall > 80 && fall < 90) {
-		// g.drawImage(lionImage, p - 120, q + 120, null);
-		// } else if (fall > 90 && fall < 3000) {
-		// g.drawImage(lionImage, p - 120 - 30, q + 120 - 30, null);
-		// }
-		g.drawImage(lionImage, fallx, fallY, null);
-		//
-		// try {
-		// Thread.sleep(200);
-		// g.clearRect(p, q, 150, 150);
-		//
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// g.drawImage(lionImage, p - 30, q + 30, null);
-		// try {
-		// Thread.sleep(200);
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// g.drawImage(lionImage, p - 60, q + 60, null);
-		// try {
-		// Thread.sleep(200);
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// g.drawImage(lionImage, p - 90, q + 90, null);
-		// try {
-		// Thread.sleep(200);
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// g.drawImage(lionImage, p - 120, q + 120, null);
-		fall++;
-		if (fall > 3000) {
-			fall = 0;
+		if (isFinishedGame) {
+			if (snoozingColor == 21) {
+				snoozingColor = 1;
+			}
+			if (snoozingColor % 20 == 0) {
+				color++;
+			}
+			if (color == 6) {
+				color = 0;
+			}
+			g.setColor(colors[color]);
+			g.setFont(new Font("Verdana", Font.BOLD, 110));
+			g.drawString("Cestitamo!", p, q);
+			snoozingColor++;
+		} else {
+			int x = (sirinaEkrana - 600) / 2;
+			int y = (visinaEkrana - 600) / 2;
+
+			g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+			g.drawImage(image, x, y, null);
 		}
+		// g.drawImage(lionImage, fallx, fallY, null);
 	}
 
 	@Override
 	public void update() {
-		if(fallx==0){
+		if (fallx == 0) {
 			return;
 		}
 		if (isFalling) {
@@ -321,7 +273,7 @@ public class MainFrame extends GameFrame {
 			}
 			j++;
 		}
-			return Util.rasterToImage(raster);
+		return Util.rasterToImage(raster);
 	}
 
 	public static void generateImages() {
@@ -387,6 +339,14 @@ public class MainFrame extends GameFrame {
 		case "cover":
 			source = coverImage.getRaster();
 			break;
+		case "resized":
+			source = Ilustrator.bilinearSize().getRaster();
+			for (int y1 = specificY; y1 < specificY + 200; y1++) {
+				for (int x1 = specificX; x1 < specificX + 200; x1++) {
+					source.getPixel(x1 - specificX, y1 - specificY, rgb);
+					raster.setPixel(x1, y1, rgb);
+				}
+			}
 		}
 		for (int y1 = specificY; y1 < specificY + 150; y1++) {
 			for (int x1 = specificX; x1 < specificX + 150; x1++) {
