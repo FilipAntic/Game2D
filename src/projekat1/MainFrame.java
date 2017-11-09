@@ -97,6 +97,7 @@ public class MainFrame extends GameFrame {
 				Koordinate k = m.getKoordinate();
 
 				if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
+					//Ilustrator.bilinearSize();
 					try {
 						if ((k.getX() == prvaOtvorenaSlika.getKoordinate().getX()
 								&& k.getY() == prvaOtvorenaSlika.getKoordinate().getY())
@@ -166,8 +167,10 @@ public class MainFrame extends GameFrame {
 		int x = (sirinaEkrana - 600) / 2;
 		int y = (visinaEkrana - 600) / 2;
 		g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-		g.drawImage(image, x, y, null);
-
+		if(getCursor().getType()==Cursor.HAND_CURSOR) {
+			g.drawImage(Ilustrator.blurGenerator(), 0, 0, null);
+		}
+			g.drawImage(image, x, y, null);
 	}
 
 	@Override
@@ -175,7 +178,6 @@ public class MainFrame extends GameFrame {
 	}
 
 	public BufferedImage makeRaster() {
-
 		int[] rgb = new int[3];
 
 		rgb[0] = 255;
@@ -196,8 +198,7 @@ public class MainFrame extends GameFrame {
 			}
 			j++;
 		}
-
-		return Util.rasterToImage(raster);
+			return Util.rasterToImage(raster);
 	}
 
 	public static void generateImages() {
