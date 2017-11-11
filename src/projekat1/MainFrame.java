@@ -335,8 +335,10 @@ public class MainFrame extends GameFrame {
 			// }
 			// }
 			// }
+
+			g.drawImage(Util.loadImage("pozornica.jpg"), 0, 0, null);
 			g.setColor(Constants.colors[color]);
-			g.setFont(new Font("Verdana", Font.BOLD, 110));
+			g.setFont(new Font("Algerian", Font.BOLD, 110));
 			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
 			break;
 		}
@@ -423,7 +425,7 @@ public class MainFrame extends GameFrame {
 
 		}
 
-		if(state.equals("Game")){
+		if (state.equals("Game")) {
 			alpha += 0.03f;
 		}
 		if (alpha >= 1.0f) {
@@ -577,7 +579,7 @@ public class MainFrame extends GameFrame {
 		clickedImage = null;
 		isClickedImageEffectOver = true;
 		clickedImageCounter = 0;
-		congratsStringCords = new Koordinate(150, 400);
+		congratsStringCords = new Koordinate(150, 150);
 		raster = Util.createRaster(600, 600, false);
 		vx = Math.random() * 50;
 		vy = 0;
