@@ -8,9 +8,9 @@ import rafgfxlib.Util;
 
 public class Ilustrator {
 
-	private static BufferedImage blurImage = Util.loadImage("slika.png");
-	private static WritableRaster source = blurImage.getRaster();
-	private static WritableRaster target = Util.createRaster(blurImage.getWidth(), blurImage.getHeight(), false);
+	private static BufferedImage coverImage = Util.loadImage("slika.png");
+	private static WritableRaster source = coverImage.getRaster();
+	private static WritableRaster target = Util.createRaster(coverImage.getWidth(), coverImage.getHeight(), false);
 	static float power = 8.0f;
 	static float size = 0.8f;
 
@@ -81,8 +81,8 @@ public class Ilustrator {
 	public static BufferedImage blurGenerator() {
 		int rgb[] = new int[3];
 
-		for (int y = 0; y < blurImage.getHeight(); y++) {
-			for (int x = 0; x < blurImage.getWidth(); x++) {
+		for (int y = 0; y < coverImage.getHeight(); y++) {
+			for (int x = 0; x < coverImage.getWidth(); x++) {
 				float srcX = (float) (x + Math.sin(y * size) * power);
 				float srcY = (float) (y + Math.cos(x * size) * power);
 				Util.bilSample(source, srcX, srcY, rgb);
@@ -96,8 +96,6 @@ public class Ilustrator {
 				size = 0.8f;
 			}
 		}
-		System.out.println(power);
-		System.out.println(size);
 
 		return Util.rasterToImage(target);
 	}
@@ -166,12 +164,8 @@ public class Ilustrator {
 		return Util.rasterToImage(resultBilinear);
 	}
 
-	public static BufferedImage resizeImage(BufferedImage image) {
+	public static BufferedImage resizeImage(BufferedImage image, int scaleW, int scaleH) {
 		WritableRaster source = image.getRaster();
-
-		int scaleW = 150;
-		int scaleH = 150;
-
 		WritableRaster target = Util.createRaster(scaleW, scaleH, false);
 
 		int rgb[] = new int[3];
@@ -201,5 +195,22 @@ public class Ilustrator {
 		if (value > max)
 			return max;
 		return value;
+	}
+
+	public static BufferedImage clickedImage() {
+		int rgb[] = new int[3];
+		int[] blackArray = { 0, 0, 0 };
+		BufferedImage coverSmallerImage = resizeImage(coverImage, 138, 138);
+		for (int y = 0; y < coverImage.getHeight(); y++) {
+			for (int x = 0; x < coverImage.getWidth(); x++) {
+				if (x < 12 || y < 12) {
+					target.setPixel(x, y, blackArray);
+				} else {
+					coverSmallerImage.getRaster().getPixel(x - 12, y - 12, rgb);
+					target.setPixel(x, y, rgb);
+				}
+			}
+		}
+		return Util.rasterToImage(target);
 	}
 }

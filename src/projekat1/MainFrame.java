@@ -1,76 +1,85 @@
 package projekat1;
 
-import java.awt.Color;
+import java.awt.AlphaComposite;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
-
 import rafgfxlib.GameFrame;
 import rafgfxlib.Util;
+import projekat1.Particle;
 
 public class MainFrame extends GameFrame {
 
-	BufferedImage coverImage = loadImage("slika.png");
-	BufferedImage crocodileImage = loadImage("crocodile.jpg");
-	BufferedImage eagleImage = loadImage("eagle.jpg");
-	BufferedImage elephantImage = loadImage("elephant.jpg");
-	BufferedImage fishImage = loadImage("fish.jpg");
-	BufferedImage giraffeImage = loadImage("giraffe.jpg");
-	BufferedImage lionImage = loadImage("lion.jpg");
-	BufferedImage monkeyImage = loadImage("monkey.jpeg");
-	BufferedImage snakeImage = loadImage("snake.jpg");
-	BufferedImage moneyImage = loadImage("money.jpg");
-	int secondFallX = 0;
-	int secondFallY = 0;
-	double airDrag = 0.99;
-	double groundFriction = 0.98;
-	double vx = Math.random() * 50;
-	double vy = 0;
-	double secondvx = Math.random() * 50;
-	double secondvy = 0;
-	double elasticity = 0.8;
-	double gravity = 0.98;
-	int fallx = 600;
-	int fallY = 150;
-	WritableRaster source = null;
-	int fall = 0;
-	int p = 150;
-	int q = 400;
-	boolean pogodjenPar = false;
-	int countPogodjenPar = 0;
-	int snoozingColor = 0;
-	final int[] ints = new Random().ints(0, 6).distinct().limit(6).toArray();
-	WritableRaster raster = Util.createRaster(600, 600, false);
-	int sirinaEkrana = getWidth();
-	BufferedImage image;
-	int color = 0;
-	int visinaEkrana = getHeight();
-	boolean first = true;
-	boolean isFinishedGame = false;
-	MemoryImage prvaOtvorenaSlika = null;
-	int prvaOtvorenaSlikaInt = 0;
-	boolean isFalling = true;
-	MemoryImage drugaOtvorenaSlika = null;
-	int drugaOtvorenaSlikaInt = 0;
-	int otvoreneSlike = 0;
-	static ArrayList<MemoryImage> imagesInGame = new ArrayList<>();
-	static ArrayList<MemoryImage> orderedImages = new ArrayList<>();
-	static String[] images = { "crocodile.jpg", "eagle.jpg", "elephant.jpg", "fish.jpg", "giraffe.jpg", "lion.jpg",
-			"monkey.jpeg", "snake.jpg" };
-	static Koordinate[] cords = { new Koordinate(0, 0), new Koordinate(150, 0), new Koordinate(300, 0),
-			new Koordinate(450, 0), new Koordinate(0, 150), new Koordinate(150, 150), new Koordinate(300, 150),
-			new Koordinate(450, 150), new Koordinate(0, 300), new Koordinate(150, 300), new Koordinate(300, 300),
-			new Koordinate(450, 300), new Koordinate(0, 450), new Koordinate(150, 450), new Koordinate(300, 450),
-			new Koordinate(450, 450) };
-	Color[] colors = { Color.BLUE, Color.CYAN, Color.GREEN, Color.PINK, Color.YELLOW, Color.WHITE };
+	// Konstante vezane za prozor
+	private final int sirinaEkrana = getWidth();
+	private final int visinaEkrana = getHeight();
+
+	// Promenljive potrebne za rad sa aplikacijom
+	private Map<String, BufferedImage> imageMap;
+	private MemoryImage cursoredImage;
+	private MemoryImage clickedImage;
+	private boolean isClickedImageEffectOver;
+	/**
+	 * Svaki krug od kad je pokrenuta animacija za kliknutu sliku se ovaj brojac
+	 * povecava i kada dodje do 20 prekida se stanje te animacije
+	 */
+	private int clickedImageCounter;
+	private Koordinate firstFallCords;
+	private Koordinate secondFallCords;
+	private double vx;
+	private double vy;
+	private double secondvx;
+	private double secondvy;
+	private WritableRaster source;
+	private Koordinate congratsStringCords;
+	private float alpha = 0.0f;
+	private boolean pogodjenPar;
+	/**
+	 * Koliko parova je pogodjeno.
+	 */
+	private int countPogodjenPar;
+	private int snoozingColor;
+	private WritableRaster raster;
+	private BufferedImage image;
+	private int color;
+	private boolean isFinishedGame;
+	private MemoryImage prvaOtvorenaSlika;
+	private int prvaOtvorenaSlikaInt;
+	private MemoryImage drugaOtvorenaSlika;
+	private int drugaOtvorenaSlikaInt;
+	private int otvoreneSlike;
+	private static ArrayList<MemoryImage> imagesInGame;
+	private static ArrayList<MemoryImage> orderedImages;
+	private boolean isMouseDown;
+	private Particle[] parts;
+	private int bunnyKeyPressed;
+	private boolean startingGame;
+	private int arrowY;
+	private boolean arrowGoingUp;
+	private String state;
+	private int bugsBunnyImage;
+	private String bugsBunnySide;
+	private String bugsBunnyImageName;
+	private int bugsBunnyFalling;
+	private boolean isQuit;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
+		initialize();
 		image = makeRaster();
+		for (int i = 0; i < Constants.PARTICLE_MAX; i++) {
+			parts[i] = new Particle();
+		}
+		genEx(500, 400, 3.0f, 200, 2);
 		startThread();
 	}
 
@@ -83,8 +92,11 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void handleKeyDown(int arg0) {
-		// TODO Auto-generated method stub
-
+		if (isKeyDown(KeyEvent.VK_LEFT)) {
+			bunnyKeyPressed -= 10;
+		} else if (isKeyDown(KeyEvent.VK_RIGHT)) {
+			bunnyKeyPressed += 10;
+		}
 	}
 
 	@Override
@@ -96,38 +108,45 @@ public class MainFrame extends GameFrame {
 	@Override
 	public void handleMouseDown(int arg0, int arg1, GFMouseButton arg2) {
 		// TODO Auto-generated method stub
+		isMouseDown = true;
 
 	}
 
 	@Override
 	public void handleMouseMove(int arg0, int arg1) {
+		cursoredImage = null;
+		int x = arg0 - ((sirinaEkrana - 600) / 2);
+		int y = arg1 - ((visinaEkrana - 600) / 2);
+		for (MemoryImage m : orderedImages) {
+			Koordinate k = m.getKoordinate();
+			if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
+				cursoredImage = m;
+			}
+		}
 		if (isFinishedGame) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		} else {
-			int x = arg0 - ((sirinaEkrana - 600) / 2);
-			int y = arg1 - ((visinaEkrana - 600) / 2);
 			if (x >= 0 && x < 600 && y >= 0 && y < 600) {
 				setCursor(new Cursor(Cursor.HAND_CURSOR));
 			} else {
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		}
+
 	}
 
 	@Override
 	public void handleMouseUp(int arg0, int arg1, GFMouseButton arg2) {
+		isMouseDown = false;
+		clickedImage = null;
 		int x = arg0 - ((sirinaEkrana - 600) / 2);
 		int y = arg1 - ((visinaEkrana - 600) / 2);
-		if (x >= 0 && x < 600 && y >= 0 && y < 600) {
+		if (x >= 0 && x < 600 && y >= 0 && y < 600 && alpha >= 1.0f) {
 			int count = 0;
 			for (MemoryImage m : orderedImages) {
 				Koordinate k = m.getKoordinate();
 				if (k.getX() < x && k.getX() + 150 > x && k.getY() < y && k.getY() + 150 > y) {
-					// Ilustrator.bilinearSize();
-					// drawSpecificCords(k.getX() - 25, k.getY() - 25,
-					// "resized", "slika");
-					// image = Util.rasterToImage(raster);
-					// sleep(1000);
+					clickedImage = m;
 					if (m.isOpened()) {
 						return;
 					}
@@ -145,9 +164,9 @@ public class MainFrame extends GameFrame {
 					if (otvoreneSlike == 3) {
 						if (pogodjenPar) {
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
-									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
+									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
-									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
+									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
 							orderedImages.get(prvaOtvorenaSlikaInt).setOpened(true);
 							orderedImages.get(drugaOtvorenaSlikaInt).setOpened(true);
 							pogodjenPar = false;
@@ -157,8 +176,10 @@ public class MainFrame extends GameFrame {
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
 									drugaOtvorenaSlika.getKoordinate().getY(), "cover", "slika");
 						}
-
+						prvaOtvorenaSlika.setFacedUp(false);
+						drugaOtvorenaSlika.setFacedUp(false);
 						prvaOtvorenaSlika = m;
+						prvaOtvorenaSlika.setFacedUp(true);
 						prvaOtvorenaSlikaInt = count;
 						drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
 								prvaOtvorenaSlika.getKoordinate().getY(), "rgb", prvaOtvorenaSlika.getName());
@@ -166,25 +187,32 @@ public class MainFrame extends GameFrame {
 						otvoreneSlike = 1;
 					} else if (otvoreneSlike == 1) {
 						prvaOtvorenaSlika = m;
+						prvaOtvorenaSlika.setFacedUp(true);
 						prvaOtvorenaSlikaInt = count;
 						drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
 								prvaOtvorenaSlika.getKoordinate().getY(), "rgb", prvaOtvorenaSlika.getName());
 					} else if (otvoreneSlike == 2) {
 						drugaOtvorenaSlika = m;
+						drugaOtvorenaSlika.setFacedUp(true);
 						drugaOtvorenaSlikaInt = count;
 						drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
 								drugaOtvorenaSlika.getKoordinate().getY(), "rgb", drugaOtvorenaSlika.getName());
 						if (drugaOtvorenaSlika.getName().equals(prvaOtvorenaSlika.getName())) {
+							firstFallCords.setX(prvaOtvorenaSlika.getKoordinate().getX() + 200);
+							firstFallCords.setY(prvaOtvorenaSlika.getKoordinate().getY() + 100);
+							secondFallCords.setX(drugaOtvorenaSlika.getKoordinate().getX() + 200);
+							secondFallCords.setY(drugaOtvorenaSlika.getKoordinate().getY() + 100);
 							pogodjenPar = true;
 							countPogodjenPar++;
 						}
 						if (countPogodjenPar == 8) {
 							System.out.println("Presao si igricu matori");
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
-									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
+									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
-									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "pogodak");
+									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
 							isFinishedGame = true;
+							genEx(500, 400, 3.0f, 200, 2);
 						}
 					}
 					break;
@@ -193,11 +221,11 @@ public class MainFrame extends GameFrame {
 			}
 			image = Util.rasterToImage(raster);
 		}
+
 	}
 
 	@Override
 	public void handleWindowDestroy() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -209,46 +237,200 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void render(Graphics2D g, int arg1, int arg2) {
-		 g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-		
-		 if (isFinishedGame) {
-		 if (snoozingColor == 21) {
-		 snoozingColor = 1;
-		 }
-		 if (snoozingColor % 20 == 0) {
-		 color++;
-		 }
-		 if (color == 6) {
-		 color = 0;
-		 }
-		 g.setColor(colors[color]);
-		 g.setFont(new Font("Verdana", Font.BOLD, 110));
-		 g.drawString("Cestitamo!", p, q);
-		 snoozingColor++;
-		 } else {
-		 int x = (sirinaEkrana - 600) / 2;
-		 int y = (visinaEkrana - 600) / 2;
-		
-		 g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-		 g.drawImage(image, x, y, null);
-		 }
-		 if (getCursor().getType() == Cursor.HAND_CURSOR) {
-		 g.drawImage(Ilustrator.blurGenerator(), 0, 0, null);
-		 }
-		if(pogodjenPar){
-			fallx = prvaOtvorenaSlika.getKoordinate().getX();
-			fallY = prvaOtvorenaSlika.getKoordinate().getY();
-			secondFallX = drugaOtvorenaSlika.getKoordinate().getX();
-			secondFallY = drugaOtvorenaSlika.getKoordinate().getY();
-			g.drawImage(lionImage, fallx, fallY, null);
-			g.drawImage(lionImage, secondFallX, secondFallY, null);
+		switch (state) {
+		case "Intro":
+			g.drawImage(Util.loadImage("backgroundIntro.jpg"), 0, 0, null);
+			g.drawImage(Util.loadImage("holePNG.png"), 700, 500, null);
+			if (bugsBunnySide.equals("right")) {
+				bugsBunnyImageName = "" + bugsBunnyImage;
+			} else if (bugsBunnySide.equals("left")) {
+				bugsBunnyImageName = bugsBunnyImage + "flip";
+			}
+			g.drawImage(Util.loadImage("bunnyWalk/bunnyWalk" + bugsBunnyImageName + ".png"), bunnyKeyPressed,
+					bugsBunnyFalling, null);
+			System.out.println(bunnyKeyPressed);
+
+			g.setFont(new Font("Verdana", Font.PLAIN, 20));
+			g.drawString("Start", 750 + 15, arrowY - 20);
+			g.drawImage(Util.loadImage("arrow.png"), 750, arrowY, null);
+			g.drawString("Quit", 75 + 15, arrowY - 20);
+			g.drawImage(Util.loadImage("arrow.png"), 75, arrowY, null);
+			break;
+		case "Game":
+			int x = (sirinaEkrana - 600) / 2;
+			int y = (visinaEkrana - 600) / 2;
+
+			// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+			for (int i = 0; i <= x; i++) {
+
+			}
+			if (startingGame) {
+				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			}
+
+			g.drawImage(image, x, y, null);
+			if (pogodjenPar && isClickedImageEffectOver) {
+				try {
+					g.drawImage(imageMap.get(prvaOtvorenaSlika.getName()), firstFallCords.getX(), firstFallCords.getY(),
+							null);
+					g.drawImage(imageMap.get(drugaOtvorenaSlika.getName()), secondFallCords.getX(),
+							secondFallCords.getY(), null);
+				} catch (Exception e) {
+
+				}
+			}
+
+			try {
+				if (cursoredImage != null && cursoredImage.isFacedUp() == false && cursoredImage.isOpened() == false
+						&& isMouseDown == false) {
+					g.drawImage(Ilustrator.blurGenerator(), cursoredImage.getKoordinate().getX() + 200,
+							cursoredImage.getKoordinate().getY() + 100, null);
+				}
+				if (clickedImage != null && clickedImageCounter < 20) {
+					isClickedImageEffectOver = false;
+					g.drawImage(Ilustrator.bilinearSize(), clickedImage.getKoordinate().getX() + 175,
+							clickedImage.getKoordinate().getY() + 75, null);
+					clickedImageCounter++;
+				} else {
+					isClickedImageEffectOver = true;
+					clickedImageCounter = 0;
+					clickedImage = null;
+				}
+				if (isMouseDown) {
+					g.drawImage(Ilustrator.clickedImage(), cursoredImage.getKoordinate().getX() + 200,
+							cursoredImage.getKoordinate().getY() + 100, null);
+				}
+			} catch (Exception e) {
+			}
+			break;
+		case "Postintro":
+			// if (isFinishedGame) {
+			//
+			// AffineTransform transform = new AffineTransform();
+			// for (Particle p : parts) {
+			// if (p.getLife() <= 0)
+			// continue;
+			//
+			// transform.setToIdentity();
+			// transform.translate(p.getPosX(), p.getPosY());
+			// transform.rotate(p.getAngle());
+			// transform.translate(-16.0, -16.0);
+			//
+			// try {
+			// transform.setToIdentity();
+			// transform.translate(p.getPosX(), p.getPosY());
+			// transform.rotate(p.getAngle());
+			// transform.translate(-16.0, -16.0);
+			// float compositeAlpha = (float) p.getLife() / (float)
+			// p.getLifeMax();
+			// if (compositeAlpha < 0.0f || compositeAlpha > 1.0f) {
+			// compositeAlpha = 0.5f;
+			// }
+			// g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+			// compositeAlpha));
+			// g.drawImage(imageMap.get("money"), transform, null);
+			// } catch (Exception e) {
+			// System.err.println(e);
+			// }
+			// }
+			// }
+			g.setColor(Constants.colors[color]);
+			g.setFont(new Font("Verdana", Font.BOLD, 110));
+			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
+			break;
 		}
-		
+
 	}
 
 	@Override
 	public void update() {
-		bouncingImage();
+
+		if (isFinishedGame) {
+			state = "Postintro";
+			if (snoozingColor == 21) {
+				snoozingColor = 1;
+			}
+			if (snoozingColor % 20 == 0) {
+				color++;
+			}
+			if (color == 6) {
+				color = 0;
+			}
+
+			snoozingColor++;
+		}
+		if (arrowGoingUp) {
+			arrowY -= 1;
+		} else {
+			arrowY += 1;
+		}
+
+		if (arrowY > 100) {
+			arrowGoingUp = true;
+		} else if (arrowY < 50) {
+			arrowGoingUp = false;
+		}
+		if (isKeyDown(KeyEvent.VK_LEFT) && bunnyKeyPressed > 191) {
+			bunnyKeyPressed -= 10;
+			bugsBunnyImage++;
+			bugsBunnySide = "left";
+		} else if (isKeyDown(KeyEvent.VK_RIGHT) && bunnyKeyPressed > 191) {
+			bunnyKeyPressed += 10;
+			bugsBunnyImage++;
+			bugsBunnySide = "right";
+		}
+
+		if (bunnyKeyPressed < 191 && bugsBunnyFalling < 900 && state.equals("Intro")) {
+			bugsBunnyFalling += 20;
+		}
+		if (bugsBunnyFalling >= 900) {
+			System.exit(0);
+		}
+
+		if (bugsBunnyImage > 12) {
+			bugsBunnyImage = 1;
+		}
+
+		if (bunnyKeyPressed < 0) {
+			bunnyKeyPressed = 0;
+		} else if (bunnyKeyPressed > 650) {
+			bunnyKeyPressed = 0;
+			state = "Game";
+			bugsBunnyFalling = 0;
+		}
+		if (pogodjenPar && isClickedImageEffectOver) {
+			bouncingImage();
+		}
+
+		if (isFinishedGame) {
+			int i = 0;
+			for (Particle p : parts) {
+				if (p.getLife() <= 0) {
+					continue;
+				}
+				p.setLife(p.getLife() - 1);
+				p.setPosX(p.getPosX() + p.getdX());
+				p.setPosY(p.getPosY() + p.getdY());
+				p.setdX(p.getdX() * 0.99f);
+				p.setdY(p.getdY() * 0.99f);
+				p.setdY(p.getdY() + 0.1f);
+				p.setAngle(p.getAngle() + p.getRot());
+				p.setRot(p.getRot() * 0.99f);
+				System.out.println(i);
+				i++;
+			}
+
+		}
+
+		if(state.equals("Game")){
+			alpha += 0.03f;
+		}
+		if (alpha >= 1.0f) {
+			alpha = 1.0f;
+			startingGame = false;
+		}
+
 	}
 
 	public void sleep(int sleep) {
@@ -267,11 +449,11 @@ public class MainFrame extends GameFrame {
 		rgb[2] = 51;
 
 		int j = 0;
-		source = coverImage.getRaster();
+		source = imageMap.get("cover").getRaster();
 		for (int i = 0; i <= 15; i++) {
-			Koordinate koordinata = cords[j];
-			int kordX = koordinata.x;
-			int kordY = koordinata.y;
+			Koordinate koordinata = Constants.cords[j];
+			int kordX = koordinata.getX();
+			int kordY = koordinata.getY();
 			for (int y = kordY; y < kordY + 150; y++) {
 				for (int x = kordX; x < kordX + 150; x++) {
 					source.getPixel(x - kordX, y - kordY, rgb);
@@ -284,8 +466,8 @@ public class MainFrame extends GameFrame {
 	}
 
 	public static void generateImages() {
-		for (int i = 0; i < images.length; i++) {
-			String imgName = images[i];
+		for (int i = 0; i < Constants.images.length; i++) {
+			String imgName = Constants.images[i];
 			String[] parts = imgName.split("\\.");
 			imagesInGame.add(new MemoryImage(parts[0], imgName));
 			imagesInGame.add(new MemoryImage(parts[0], imgName));
@@ -296,12 +478,8 @@ public class MainFrame extends GameFrame {
 		int[] randomImages = new Random().ints(0, 16).distinct().limit(16).toArray();
 		for (int i = 0; i < randomImages.length; i++) {
 			MemoryImage img = imagesInGame.get(randomImages[i]);
-			img.setKoordinate(cords[i]);
+			img.setKoordinate(Constants.cords[i]);
 			orderedImages.add(img);
-		}
-
-		for (MemoryImage m : orderedImages) {
-			System.out.println(m);
 		}
 	}
 
@@ -312,48 +490,11 @@ public class MainFrame extends GameFrame {
 		rgb[2] = 51;
 		switch (whatImage) {
 		case "rgb":
-			switch (nameOfImage) {
-			case "monkey":
-				source = monkeyImage.getRaster();
-				break;
-			case "crocodile":
-				source = crocodileImage.getRaster();
-				break;
-			case "eagle":
-				source = eagleImage.getRaster();
-				break;
-			case "elephant":
-				source = elephantImage.getRaster();
-				break;
-			case "fish":
-				source = fishImage.getRaster();
-				break;
-			case "giraffe":
-				source = giraffeImage.getRaster();
-				break;
-			case "lion":
-				source = lionImage.getRaster();
-				break;
-			case "snake":
-				source = snakeImage.getRaster();
-				break;
-			case "pogodak":
-				source = moneyImage.getRaster();
-				break;
-			}
-
+			source = imageMap.get(nameOfImage).getRaster();
 			break;
 		case "cover":
-			source = coverImage.getRaster();
+			source = imageMap.get("cover").getRaster();
 			break;
-		case "resized":
-			source = Ilustrator.bilinearSize().getRaster();
-			for (int y1 = specificY; y1 < specificY + 200; y1++) {
-				for (int x1 = specificX; x1 < specificX + 200; x1++) {
-					source.getPixel(x1 - specificX, y1 - specificY, rgb);
-					raster.setPixel(x1, y1, rgb);
-				}
-			}
 		}
 		for (int y1 = specificY; y1 < specificY + 150; y1++) {
 			for (int x1 = specificX; x1 < specificX + 150; x1++) {
@@ -365,68 +506,152 @@ public class MainFrame extends GameFrame {
 	}
 
 	public BufferedImage loadImage(String imageName) {
-
-		return Ilustrator.resizeImage(Util.loadImage(imageName));
+		return Ilustrator.resizeImage(Util.loadImage(imageName), 150, 150);
 	}
 
 	public void bouncingImage() {
-		fallx += vx;
-		fallY += vy;
+		firstFallCords.setX((int) (firstFallCords.getX() + vx));
+		firstFallCords.setY((int) (firstFallCords.getY() + vy));
 
 		// bounce Y (don't bounce on top)
-		if (fallY >= getHeight() - 150) {
-			fallY = getHeight() - 150; // (!) GROUND LIMIT
-			vy = -(vy * elasticity);
+		if (firstFallCords.getY() >= getHeight() - 150) {
+			firstFallCords.setY(getHeight() - 150);
+			vy = -(vy * Constants.elasticity);
 		}
 
 		// bounce X
-		if ((fallx >= getWidth() - 150) || (fallx <= 0)) {
-
-			fallx = (fallx < (0 + 150) ? (0) : (getWidth() - 150)); // (!)
-																	// WALLS
-																	// LIMIT
-			vx = -(vx * elasticity);
+		if ((firstFallCords.getX() >= getWidth() - 150) || (firstFallCords.getX() <= 0)) {
+			firstFallCords.setX((firstFallCords.getX() < (0 + 150) ? (0) : (getWidth() - 150)));
+			// WALLS
+			// LIMIT
+			vx = -(vx * Constants.elasticity);
 		}
 
 		// compute gravity
-		vy += gravity;
+		vy += Constants.gravity;
 
 		// compute frictions
-		vx *= airDrag;
-		vy *= airDrag;
-		if (fallY >= (getHeight() - 150)) { // grounded
-			vx *= groundFriction;
+		vx *= Constants.airDrag;
+		vy *= Constants.airDrag;
+		if (firstFallCords.getY() >= (getHeight() - 150)) { // grounded
+			vx *= Constants.groundFriction;
 		}
 
 		// ----------------------------druga
 		// slika----------------------------------------
 
-		secondFallX += secondvx;
-		secondFallY += secondvy;
+		secondFallCords.setX((int) (secondFallCords.getX() + secondvx));
+		secondFallCords.setY((int) (secondFallCords.getY() + secondvy));
 
 		// bounce Y (don't bounce on top)
-		if (secondFallY >= getHeight() - 150) {
-			secondFallY = getHeight() - 150; // (!) GROUND LIMIT
-			secondvy = -(secondvy * elasticity);
+		if (secondFallCords.getY() >= getHeight() - 150) {
+			secondFallCords.setY(getHeight() - 150); // (!) GROUND LIMIT
+			secondvy = -(secondvy * Constants.elasticity);
 		}
 
 		// bounce X
-		if ((secondFallX >= getWidth() - 150) || (secondFallX <= 0)) {
+		if ((secondFallCords.getX() >= getWidth() - 150) || (secondFallCords.getX() <= 0)) {
 
-			secondFallX = (secondFallX < (0 + 150) ? (0) : (getWidth() - 150)); // (!)
+			secondFallCords.setX((secondFallCords.getX() < (0 + 150) ? (0) : (getWidth() - 150))); // (!)
 			// WALLS
 			// LIMIT
-			secondvx = -(secondvx * elasticity);
+			secondvx = -(secondvx * Constants.elasticity);
 		}
 
 		// compute gravity
-		secondvy += gravity;
+		secondvy += Constants.gravity;
 
 		// compute frictions
-		secondvx *= airDrag;
-		secondvy *= airDrag;
-		if (secondFallY >= (getHeight() - 150)) { // grounded
-			secondvx *= groundFriction;
+		secondvx *= Constants.airDrag;
+		secondvy *= Constants.airDrag;
+		if (secondFallCords.getY() >= (getHeight() - 150)) { // grounded
+			secondvx *= Constants.groundFriction;
+		}
+	}
+
+	private void initialize() {
+		secondFallCords = new Koordinate(0, 0);
+		firstFallCords = new Koordinate(0, 0);
+		imageMap = new HashMap<String, BufferedImage>();
+		cursoredImage = null;
+		clickedImage = null;
+		isClickedImageEffectOver = true;
+		clickedImageCounter = 0;
+		congratsStringCords = new Koordinate(150, 400);
+		raster = Util.createRaster(600, 600, false);
+		vx = Math.random() * 50;
+		vy = 0;
+		secondvx = Math.random() * 50;
+		secondvy = 0;
+		source = null;
+		pogodjenPar = false;
+		countPogodjenPar = 0;
+		snoozingColor = 0;
+		color = 0;
+		isFinishedGame = false;
+		prvaOtvorenaSlika = null;
+		prvaOtvorenaSlikaInt = 0;
+		drugaOtvorenaSlika = null;
+		drugaOtvorenaSlikaInt = 0;
+		otvoreneSlike = 0;
+		imagesInGame = new ArrayList<>();
+		orderedImages = new ArrayList<>();
+		isMouseDown = false;
+		parts = new Particle[Constants.PARTICLE_MAX];
+		bunnyKeyPressed = 350;
+		startingGame = true;
+		arrowY = 50;
+		arrowGoingUp = false;
+		state = "Intro";
+		bugsBunnyImage = 1;
+		bugsBunnySide = "right";
+		bugsBunnyFalling = 400;
+		isQuit = false;
+		fillMap();
+	}
+
+	public void fillMap() {
+		BufferedImage coverImage = loadImage("slika.png");
+		BufferedImage crocodileImage = loadImage("crocodile.jpg");
+		BufferedImage eagleImage = loadImage("eagle.jpg");
+		BufferedImage elephantImage = loadImage("elephant.jpg");
+		BufferedImage fishImage = loadImage("fish.jpg");
+		BufferedImage giraffeImage = loadImage("giraffe.jpg");
+		BufferedImage lionImage = loadImage("lion.jpg");
+		BufferedImage monkeyImage = loadImage("monkey.jpeg");
+		BufferedImage snakeImage = loadImage("snake.jpg");
+		BufferedImage moneyImage = loadImage("money.jpg");
+		imageMap.put("cover", coverImage);
+		imageMap.put("crocodile", crocodileImage);
+		imageMap.put("eagle", eagleImage);
+		imageMap.put("elephant", elephantImage);
+		imageMap.put("fish", fishImage);
+		imageMap.put("giraffe", giraffeImage);
+		imageMap.put("lion", lionImage);
+		imageMap.put("monkey", monkeyImage);
+		imageMap.put("snake", snakeImage);
+		imageMap.put("money", moneyImage);
+	}
+
+	private void genEx(float cX, float cY, float radius, int life, int count) {
+		for (Particle p : parts) {
+			if (p.getLife() <= 0) {
+				p.setLife((int) (Math.random() * life * 0.5) + life / 2);
+				p.setLifeMax((int) (Math.random() * life * 0.5) + life / 2);
+				p.setPosX(cX);
+				p.setPosY(cY);
+				double angle = Math.random() * Math.PI * 2.0;
+				double speed = Math.random() * radius;
+				p.setdX((float) (Math.cos(angle) * speed));
+				p.setdY((float) (Math.sin(angle) * speed));
+				p.setAngle((float) (Math.random() * Math.PI * 2.0));
+				p.setRot((float) (Math.random() - 0.5) * 0.3f);
+
+				// p.setImageID(imageID); = (int) (Math.random() * MAX_SPRITES);
+				count--;
+				if (count <= 0)
+					return;
+			}
 		}
 	}
 }

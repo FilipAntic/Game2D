@@ -2,11 +2,10 @@ package projekat1;
 
 public class Koordinate {
 
-	int x;
-	int y;
+	private int x;
+	private int y;
 
 	public Koordinate(int x, int y) {
-		super();
 		this.x = x;
 		this.y = y;
 	}

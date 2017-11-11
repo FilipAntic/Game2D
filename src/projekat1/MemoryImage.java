@@ -10,6 +10,7 @@ public class MemoryImage {
 	private Koordinate koordinate;
 	private boolean isOpened;
 	private String ID;
+	private boolean isFacedUp;
 
 	public MemoryImage(String name, String path, Koordinate koordinate) {
 		this.name = name;
@@ -17,6 +18,7 @@ public class MemoryImage {
 		this.koordinate = koordinate;
 		setOpened(false);
 		setID(UUID.randomUUID().toString());
+		setFacedUp(false);
 	}
 
 	public MemoryImage() {
@@ -66,6 +68,14 @@ public class MemoryImage {
 
 	public void setID(String iD) {
 		ID = iD;
+	}
+
+	public boolean isFacedUp() {
+		return isFacedUp;
+	}
+
+	public void setFacedUp(boolean isFacedUp) {
+		this.isFacedUp = isFacedUp;
 	}
 
 	@Override
