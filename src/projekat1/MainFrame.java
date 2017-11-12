@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
 import rafgfxlib.GameFrame;
 import rafgfxlib.Util;
-import projekat1.Particle;
 
 public class MainFrame extends GameFrame {
 
@@ -75,6 +75,8 @@ public class MainFrame extends GameFrame {
 	private int confettiMatrixH;
 	private int noiseImageCounter;
 	private boolean noiseUp;
+	private int counterForPostIntro;
+	private float composite;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
@@ -83,7 +85,7 @@ public class MainFrame extends GameFrame {
 		for (int i = 0; i < Constants.PARTICLE_MAX; i++) {
 			parts[i] = new Particle();
 		}
-		genEx(500, 400, 3.0f, 200, 2);
+		genEx(1000, 800, 3.0f, 200, 100);
 		startThread();
 	}
 
@@ -207,6 +209,11 @@ public class MainFrame extends GameFrame {
 							secondFallCords.setX(drugaOtvorenaSlika.getKoordinate().getX() + 200);
 							secondFallCords.setY(drugaOtvorenaSlika.getKoordinate().getY() + 100);
 							pogodjenPar = true;
+							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
+									prvaOtvorenaSlika.getKoordinate().getY(), "background", "map");
+							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
+									drugaOtvorenaSlika.getKoordinate().getY(), "background", "map");
+							composite = 1.0f;
 							countPogodjenPar++;
 						}
 						if (countPogodjenPar == 8) {
@@ -216,7 +223,7 @@ public class MainFrame extends GameFrame {
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
 									drugaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							isFinishedGame = true;
-							genEx(500, 400, 3.0f, 200, 2);
+							genEx(1000, 800, 3.0f, 200, 2);
 						}
 					}
 					break;
@@ -274,10 +281,12 @@ public class MainFrame extends GameFrame {
 			g.drawImage(image, x, y, null);
 			if (pogodjenPar && isClickedImageEffectOver) {
 				try {
+					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, composite));
 					g.drawImage(imageMap.get(prvaOtvorenaSlika.getName()), firstFallCords.getX(), firstFallCords.getY(),
 							null);
 					g.drawImage(imageMap.get(drugaOtvorenaSlika.getName()), secondFallCords.getX(),
 							secondFallCords.getY(), null);
+
 				} catch (Exception e) {
 
 				}
@@ -307,53 +316,56 @@ public class MainFrame extends GameFrame {
 			}
 			break;
 		case "Postintro":
-			// if (isFinishedGame) {
-			//
-			// AffineTransform transform = new AffineTransform();
-			// for (Particle p : parts) {
-			// if (p.getLife() <= 0)
-			// continue;
-			//
-			// transform.setToIdentity();
-			// transform.translate(p.getPosX(), p.getPosY());
-			// transform.rotate(p.getAngle());
-			// transform.translate(-16.0, -16.0);
-			//
-			// try {
-			// transform.setToIdentity();
-			// transform.translate(p.getPosX(), p.getPosY());
-			// transform.rotate(p.getAngle());
-			// transform.translate(-16.0, -16.0);
-			// float compositeAlpha = (float) p.getLife() / (float)
-			// p.getLifeMax();
-			// if (compositeAlpha < 0.0f || compositeAlpha > 1.0f) {
-			// compositeAlpha = 0.5f;
-			// }
-			// g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-			// compositeAlpha));
-			// g.drawImage(imageMap.get("money"), transform, null);
-			// } catch (Exception e) {
-			// System.err.println(e);
-			// }
-			// }
-			// }
+			g.drawImage(Util.loadImage("pozornica.jpg"), 0, 0, null);
+			g.setColor(Constants.colors[color]);
+			g.setFont(new Font("Algerian", Font.BOLD, 110));
+			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
+			AffineTransform transform = new AffineTransform();
+			int i = 0;
+			for (Particle p : parts) {
+				if (p.getLife() <= 0)
+					continue;
+				transform.setToIdentity();
+				transform.translate(randomInt(1000), randomInt(800));
+				transform.rotate(p.getAngle());
+				transform.translate(-16.0, -16.0);
 
-			// g.drawImage(Util.loadImage("pozornica.jpg"), 0, 0, null);
-			// g.setColor(Constants.colors[color]);
-			// g.setFont(new Font("Algerian", Font.BOLD, 110));
-			// g.drawString("Cestitamo!", congratsStringCords.getX(),
-			// congratsStringCords.getY());
-			for (int i = 0; i < 20; i++) {
-				g.drawImage(imageMap.get("particles" + i), randomInt(1000), randomInt(800), null);
+				try {
+					transform.setToIdentity();
+					transform.translate(p.getPosX(), p.getPosY());
+					transform.rotate(p.getAngle());
+					transform.translate(-16.0, -16.0);
+					float compositeAlpha = (float) p.getLife() / (float) p.getLifeMax();
+					if (compositeAlpha < 0.0f || compositeAlpha > 1.0f) {
+						compositeAlpha = 0.5f;
+					}
+					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, compositeAlpha));
+					g.drawImage(imageMap.get("particles" + i), transform, null);
+					i++;
+					if (i > 20) {
+						i = 0;
+					}
+				} catch (Exception e) {
+					System.err.println(e);
+				}
 			}
+
+			// for (int i = 0; i < 20; i++) {
+			// g.drawImage(imageMap.get("particles" + i), randomInt(1000),
+			// randomInt(800), null);
+			// }
 			break;
 		}
 	}
 
 	@Override
 	public void update() {
+		composite -= 0.005;
+		if (composite < 0.0f) {
+			composite = 0;
+		}
 		if (state.equals("Postintro")) {
-			confettiDestY += 10;
+			confettiDestY += 1;
 			confettiMatrixH += 1;
 			if (confettiMatrixH > 5) {
 				confettiMatrixH = 0;
@@ -363,18 +375,21 @@ public class MainFrame extends GameFrame {
 			}
 		}
 		if (isFinishedGame) {
-			state = "Postintro";
-			if (snoozingColor == 21) {
-				snoozingColor = 1;
-			}
-			if (snoozingColor % 20 == 0) {
-				color++;
-			}
-			if (color == 6) {
-				color = 0;
-			}
+			if (counterForPostIntro > 100) {
+				state = "Postintro";
+				if (snoozingColor == 21) {
+					snoozingColor = 1;
+				}
+				if (snoozingColor % 20 == 0) {
+					color++;
+				}
+				if (color == 6) {
+					color = 0;
+				}
 
-			snoozingColor++;
+				snoozingColor++;
+			}
+			counterForPostIntro++;
 		}
 		if (arrowGoingUp) {
 			arrowY -= 1;
@@ -420,8 +435,8 @@ public class MainFrame extends GameFrame {
 			bouncingImage();
 		}
 
-		if (isFinishedGame) {
-			int i = 0;
+		if (true) {
+			int ix = 0;
 			for (Particle p : parts) {
 				if (p.getLife() <= 0) {
 					continue;
@@ -434,8 +449,7 @@ public class MainFrame extends GameFrame {
 				p.setdY(p.getdY() + 0.1f);
 				p.setAngle(p.getAngle() + p.getRot());
 				p.setRot(p.getRot() * 0.99f);
-				System.out.println(i);
-				i++;
+				ix++;
 			}
 
 		}
@@ -459,7 +473,7 @@ public class MainFrame extends GameFrame {
 			alpha = 1.0f;
 			startingGame = false;
 		}
-
+		genEx(randomInt(1000), randomInt(800), 3.0f, 200, 20);
 	}
 
 	public void sleep(int sleep) {
@@ -606,6 +620,7 @@ public class MainFrame extends GameFrame {
 		if (secondFallCords.getY() >= (getHeight() - 150)) { // grounded
 			secondvx *= Constants.groundFriction;
 		}
+		System.out.println(vy);
 	}
 
 	private void initialize() {
@@ -641,30 +656,31 @@ public class MainFrame extends GameFrame {
 		startingGame = true;
 		arrowY = 50;
 		arrowGoingUp = false;
-		state = "Game";
+		state = "Intro";
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
 		confettiDestY = 0;
 		confettiMatrixH = 0;
 		noiseImageCounter = 1;
+		counterForPostIntro = 0;
 		noiseImageCounter = 1;
 		fillMap();
 		noiseUp = true;
+		composite = 1.0f;
 	}
 
 	public void fillMap() {
 		BufferedImage mapImage = Util.loadImage("map.jpg");
 		BufferedImage coverImage = loadImage("slika.png");
-		BufferedImage crocodileImage = loadImage("crocodile.jpg");
-		BufferedImage eagleImage = loadImage("eagle.jpg");
-		BufferedImage elephantImage = loadImage("elephant.jpg");
-		BufferedImage fishImage = loadImage("fish.jpg");
-		BufferedImage giraffeImage = loadImage("giraffe.jpg");
-		BufferedImage lionImage = loadImage("lion.jpg");
-		BufferedImage monkeyImage = loadImage("monkey.jpeg");
-		BufferedImage snakeImage = loadImage("snake.jpg");
-		BufferedImage moneyImage = loadImage("money.jpg");
+		BufferedImage crocodileImage = loadImage("animals/crocodile.jpg");
+		BufferedImage eagleImage = loadImage("animals/eagle.jpg");
+		BufferedImage elephantImage = loadImage("animals/elephant.jpg");
+		BufferedImage fishImage = loadImage("animals/fish.jpg");
+		BufferedImage giraffeImage = loadImage("animals/giraffe.jpg");
+		BufferedImage lionImage = loadImage("animals/lion.jpg");
+		BufferedImage monkeyImage = loadImage("animals/monkey.jpeg");
+		BufferedImage snakeImage = loadImage("animals/snake.jpg");
 		imageMap.put("map", mapImage);
 		imageMap.put("cover", coverImage);
 		imageMap.put("crocodile", crocodileImage);
@@ -675,9 +691,11 @@ public class MainFrame extends GameFrame {
 		imageMap.put("lion", lionImage);
 		imageMap.put("monkey", monkeyImage);
 		imageMap.put("snake", snakeImage);
-		imageMap.put("money", moneyImage);
 		for (int counter = 1; counter < 51; counter++) {
-			imageMap.put("noise" + counter, Util.loadImage("noise" + counter + ".png"));
+			imageMap.put("noise" + counter, Util.loadImage("noise/noise" + counter + ".png"));
+		}
+		for (int counter = 0; counter < 20; counter++) {
+			imageMap.put("particles" + counter, Util.loadImage("particles/particle" + (counter + 1) + ".png"));
 		}
 
 	}
@@ -687,16 +705,14 @@ public class MainFrame extends GameFrame {
 			if (p.getLife() <= 0) {
 				p.setLife((int) (Math.random() * life * 0.5) + life / 2);
 				p.setLifeMax((int) (Math.random() * life * 0.5) + life / 2);
-				p.setPosX(cX);
-				p.setPosY(cY);
+				p.setPosX(randomInt((int) cX));
+				p.setPosY(randomInt((int) cY));
 				double angle = Math.random() * Math.PI * 2.0;
 				double speed = Math.random() * radius;
 				p.setdX((float) (Math.cos(angle) * speed));
 				p.setdY((float) (Math.sin(angle) * speed));
 				p.setAngle((float) (Math.random() * Math.PI * 2.0));
 				p.setRot((float) (Math.random() - 0.5) * 0.3f);
-
-				// p.setImageID(imageID); = (int) (Math.random() * MAX_SPRITES);
 				count--;
 				if (count <= 0)
 					return;
@@ -706,6 +722,9 @@ public class MainFrame extends GameFrame {
 
 	public int randomInt(int range) {
 		Random rand = new Random();
+		if (range <= 0) {
+			range = 1000;
+		}
 		return rand.nextInt(range);
 	}
 }

@@ -16,5 +16,5 @@ public class Constants {
 			new Koordinate(450, 450) };
 	public static final String[] images = { "crocodile.jpg", "eagle.jpg", "elephant.jpg", "fish.jpg", "giraffe.jpg",
 			"lion.jpg", "monkey.jpeg", "snake.jpg" };
-	public static final int PARTICLE_MAX = 16;
+	public static final int PARTICLE_MAX = 100;
 }
