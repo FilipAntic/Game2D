@@ -77,6 +77,7 @@ public class MainFrame extends GameFrame {
 	private boolean noiseUp;
 	private int counterForPostIntro;
 	private float composite;
+	private int bunnyDancingCounter;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
@@ -320,6 +321,8 @@ public class MainFrame extends GameFrame {
 			g.setColor(Constants.colors[color]);
 			g.setFont(new Font("Algerian", Font.BOLD, 110));
 			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
+			g.drawImage(Util.loadImage("bunnyDancing/bunnyDancing" + (bunnyDancingCounter + 1) + ".png"), 600, 500,
+					null);
 			AffineTransform transform = new AffineTransform();
 			int i = 0;
 			for (Particle p : parts) {
@@ -365,6 +368,10 @@ public class MainFrame extends GameFrame {
 			composite = 0;
 		}
 		if (state.equals("Postintro")) {
+			bunnyDancingCounter++;
+			if (bunnyDancingCounter > 47) {
+				bunnyDancingCounter = 0;
+			}
 			confettiDestY += 1;
 			confettiMatrixH += 1;
 			if (confettiMatrixH > 5) {
@@ -656,7 +663,7 @@ public class MainFrame extends GameFrame {
 		startingGame = true;
 		arrowY = 50;
 		arrowGoingUp = false;
-		state = "Intro";
+		state = "Postintro";
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
@@ -668,6 +675,7 @@ public class MainFrame extends GameFrame {
 		fillMap();
 		noiseUp = true;
 		composite = 1.0f;
+		bunnyDancingCounter = 0;
 	}
 
 	public void fillMap() {
