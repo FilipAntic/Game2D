@@ -218,6 +218,7 @@ public class MainFrame extends GameFrame {
 							secondFallCords.setX(drugaOtvorenaSlika.getKoordinate().getX() + 200);
 							secondFallCords.setY(drugaOtvorenaSlika.getKoordinate().getY() + 100);
 							pogodjenPar = true;
+
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
 									prvaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
@@ -288,7 +289,7 @@ public class MainFrame extends GameFrame {
 			}
 
 			g.drawImage(image, x, y, null);
-			if (pogodjenPar && isClickedImageEffectOver) {
+			if (pogodjenPar && isClickedImageEffectOver && alpha2 > 0) {
 				try {
 					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, composite));
 					g.drawImage(imageMap.get(prvaOtvorenaSlika.getName()), firstFallCords.getX(), firstFallCords.getY(),
@@ -385,8 +386,8 @@ public class MainFrame extends GameFrame {
 			fontXBool = true;
 		}
 
-		congratsStringCords.setX(getX()+150);
-		congratsStringCords.setY(getY()+300);
+		congratsStringCords.setX(getX() + 150);
+		congratsStringCords.setY(getY() + 300);
 
 		composite -= 0.005;
 		if (composite < 0.0f) {
@@ -463,13 +464,12 @@ public class MainFrame extends GameFrame {
 			state = "Game";
 			bugsBunnyFalling = 0;
 		}
-		if (pogodjenPar) {
+		if (pogodjenPar && otvoreneSlike == 2) {
 			// bouncingImage();
 			alpha2 += -0.01f;
 			if (alpha2 <= 0) {
 				alpha2 = 0;
 				timer.stop();
-				isClickedImageEffectOver = true;
 			}
 			fadeOutImage(timer);
 		}
@@ -711,7 +711,6 @@ public class MainFrame extends GameFrame {
 		composite = 1.0f;
 		bunnyDancingCounter = 0;
 		timer = new Timer(20, null);
-
 
 	}
 
