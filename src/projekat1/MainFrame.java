@@ -50,6 +50,7 @@ public class MainFrame extends GameFrame {
 	private int snoozingColor;
 	private WritableRaster raster;
 	private BufferedImage image;
+	private BufferedImage noiseImage;
 	private int color;
 	private boolean isFinishedGame;
 	private MemoryImage prvaOtvorenaSlika;
@@ -259,8 +260,13 @@ public class MainFrame extends GameFrame {
 		case "Game":
 			int x = (sirinaEkrana - 600) / 2;
 			int y = (visinaEkrana - 600) / 2;
-
-			// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
+			
+			int counter;
+			for(counter=1; counter < 51; counter++) {
+				g.drawImage(imageMap.get("noise" + counter + ".png"), null, 0,0);
+			}
+			counter = 1;
+			
 			for (int i = 0; i <= x; i++) {
 
 			}
@@ -350,6 +356,10 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void update() {
+		
+		for(int counter = 1; counter<51; counter++) {
+			imageMap.put("noise" + counter, Util.loadImage("noise" + (counter + 1 ) + ".png"));
+		}
 
 		if (isFinishedGame) {
 			state = "Postintro";
@@ -607,7 +617,7 @@ public class MainFrame extends GameFrame {
 		startingGame = true;
 		arrowY = 50;
 		arrowGoingUp = false;
-		state = "Postintro";
+		state = "Game";
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;

@@ -3,6 +3,7 @@ package projekat1;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.nio.BufferUnderflowException;
+import java.sql.Savepoint;
 import java.util.Random;
 
 import rafgfxlib.ImageViewer;
@@ -19,28 +20,30 @@ public class Ilustrator {
 	/*
 	 * Noise
 	 */
-	private static BufferedImage noiseImage = new BufferedImage(MainFrame.WIDTH, MainFrame.HEIGHT,
+	private static BufferedImage noiseImage = new BufferedImage(1000, 1000,
 			BufferedImage.TYPE_INT_RGB);
 	private static Random random = new Random();
 	private static double time = 0;
-
-	public static BufferedImage noiseGeneratro() {
+	private static int counter = 1;
+	public static BufferedImage noiseGenerator() {
 		time += 0.01;
 
-		for (int y = 0; y < MainFrame.HEIGHT; y++) {
-			for (int x = 0; x < MainFrame.WIDTH; x++) {
-				double dx = (double) x / MainFrame.HEIGHT;
-				double dy = (double) y / MainFrame.HEIGHT;
+		for (int y = 0; y < 1000; y++) {
+			for (int x = 0; x < 1000; x++) {
+				double dx = (double) x / 1000;
+				double dy = (double) y / 1000;
 				int frequency = 6;
-				double noise = noise((dx * time) + time, (dy * time) + time, time);
+				double noise = noise(dx * frequency + time, dy * frequency + time, time);
 				noise = (noise - 1) / 2;
 				int b = (int) (noise * 0xFF);
 				int g = b * 0x100;
 				int r = b * 0x10000;
-				int finalValue = r;
+				int finalValue = r ;
 				noiseImage.setRGB(x, y, finalValue);
 			}
 		}
+//		Util.saveImage(noiseImage, "noise" + counter + ".png");
+//		counter ++;
 		return noiseImage;
 	}
 
