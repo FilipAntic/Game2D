@@ -164,9 +164,9 @@ public class MainFrame extends GameFrame {
 					if (otvoreneSlike == 3) {
 						if (pogodjenPar) {
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
-									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									prvaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
-									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									drugaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							orderedImages.get(prvaOtvorenaSlikaInt).setOpened(true);
 							orderedImages.get(drugaOtvorenaSlikaInt).setOpened(true);
 							pogodjenPar = false;
@@ -208,9 +208,9 @@ public class MainFrame extends GameFrame {
 						if (countPogodjenPar == 8) {
 							System.out.println("Presao si igricu matori");
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
-									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									prvaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
-									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									drugaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							isFinishedGame = true;
 							genEx(500, 400, 3.0f, 200, 2);
 						}
@@ -500,6 +500,16 @@ public class MainFrame extends GameFrame {
 		case "cover":
 			source = imageMap.get("cover").getRaster();
 			break;
+		case "background":
+			source = imageMap.get("map").getRaster();
+			for (int y1 = specificY; y1 < specificY + 150; y1++) {
+				for (int x1 = specificX; x1 < specificX + 150; x1++) {
+					source.getPixel(x1, y1, rgb);
+					raster.setPixel(x1, y1, rgb);
+				}
+			}
+			return;
+
 		}
 		for (int y1 = specificY; y1 < specificY + 150; y1++) {
 			for (int x1 = specificX; x1 < specificX + 150; x1++) {
@@ -607,7 +617,7 @@ public class MainFrame extends GameFrame {
 		startingGame = true;
 		arrowY = 50;
 		arrowGoingUp = false;
-		state = "Postintro";
+		state = "Game";
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
@@ -616,6 +626,7 @@ public class MainFrame extends GameFrame {
 	}
 
 	public void fillMap() {
+		BufferedImage mapImage = Util.loadImage("map.jpg");
 		BufferedImage coverImage = loadImage("slika.png");
 		BufferedImage crocodileImage = loadImage("crocodile.jpg");
 		BufferedImage eagleImage = loadImage("eagle.jpg");
@@ -626,6 +637,7 @@ public class MainFrame extends GameFrame {
 		BufferedImage monkeyImage = loadImage("monkey.jpeg");
 		BufferedImage snakeImage = loadImage("snake.jpg");
 		BufferedImage moneyImage = loadImage("money.jpg");
+		imageMap.put("map", mapImage);
 		imageMap.put("cover", coverImage);
 		imageMap.put("crocodile", crocodileImage);
 		imageMap.put("eagle", eagleImage);
