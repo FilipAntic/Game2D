@@ -336,10 +336,13 @@ public class MainFrame extends GameFrame {
 			// }
 			// }
 
-			g.drawImage(Util.loadImage("pozornica.jpg"), 0, 0, null);
-			g.setColor(Constants.colors[color]);
-			g.setFont(new Font("Algerian", Font.BOLD, 110));
-			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
+			// g.drawImage(Util.loadImage("pozornica.jpg"), 0, 0, null);
+			// g.setColor(Constants.colors[color]);
+			// g.setFont(new Font("Algerian", Font.BOLD, 110));
+			// g.drawString("Cestitamo!", congratsStringCords.getX(),
+			// congratsStringCords.getY());
+			g.drawImage(Util.loadImage("particles/particles.jpg"), 100, 100, 100 + 152 / 2, 100 + 331 / 5, 2 * 152 / 2,
+					2 * 331 / 5, 2 * 152 / 2 + 152 / 2, 2 * 331 / 5 + 331 / 5, null);
 			break;
 		}
 
@@ -604,7 +607,7 @@ public class MainFrame extends GameFrame {
 		startingGame = true;
 		arrowY = 50;
 		arrowGoingUp = false;
-		state = "Intro";
+		state = "Postintro";
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
