@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import javax.swing.Timer;
 
 import rafgfxlib.GameFrame;
 import rafgfxlib.Util;
@@ -29,6 +32,8 @@ public class MainFrame extends GameFrame {
 	private MemoryImage cursoredImage;
 	private MemoryImage clickedImage;
 	private boolean isClickedImageEffectOver;
+	private Timer timer;
+	private float alpha2 = 1f;
 	/**
 	 * Svaki krug od kad je pokrenuta animacija za kliknutu sliku se ovaj brojac
 	 * povecava i kada dodje do 20 prekida se stanje te animacije
@@ -458,8 +463,15 @@ public class MainFrame extends GameFrame {
 			state = "Game";
 			bugsBunnyFalling = 0;
 		}
-		if (pogodjenPar && isClickedImageEffectOver) {
-			bouncingImage();
+		if (pogodjenPar) {
+			// bouncingImage();
+			alpha2 += -0.01f;
+			if (alpha2 <= 0) {
+				alpha2 = 0;
+				timer.stop();
+				isClickedImageEffectOver = true;
+			}
+			fadeOutImage(timer);
 		}
 
 		if (true) {
@@ -657,7 +669,7 @@ public class MainFrame extends GameFrame {
 		imageMap = new HashMap<String, BufferedImage>();
 		cursoredImage = null;
 		clickedImage = null;
-		isClickedImageEffectOver = true;
+		isClickedImageEffectOver = false;
 		clickedImageCounter = 0;
 		congratsStringCords = new Koordinate(150, 150);
 		raster = Util.createRaster(600, 600, false);
@@ -684,7 +696,7 @@ public class MainFrame extends GameFrame {
 		startingGame = true;
 		arrowY = 50;
 		arrowGoingUp = false;
-		state = "Postintro";
+		state = "Intro";
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
@@ -698,12 +710,14 @@ public class MainFrame extends GameFrame {
 		fontXBool = false;
 		composite = 1.0f;
 		bunnyDancingCounter = 0;
+		timer = new Timer(20, null);
+
 
 	}
 
 	public void fillMap() {
 		BufferedImage mapImage = Util.loadImage("map.jpg");
-		BufferedImage coverImage = loadImage("slika.png");
+		BufferedImage coverImage = Util.loadImage("slika.png");
 		BufferedImage crocodileImage = loadImage("animals/crocodile.jpg");
 		BufferedImage eagleImage = loadImage("animals/eagle.jpg");
 		BufferedImage elephantImage = loadImage("animals/elephant.jpg");
@@ -757,5 +771,9 @@ public class MainFrame extends GameFrame {
 			range = 1000;
 		}
 		return rand.nextInt(range);
+	}
+
+	public static void fadeOutImage(Timer timer) {
+		timer.start();
 	}
 }
