@@ -26,14 +26,14 @@ public class MainFrame extends GameFrame {
 	// Konstante vezane za prozor
 	private final int sirinaEkrana = getWidth();
 	private final int visinaEkrana = getHeight();
-
+	private int animate = 0;
 	// Promenljive potrebne za rad sa aplikacijom
 	private Map<String, BufferedImage> imageMap;
 	private MemoryImage cursoredImage;
 	private MemoryImage clickedImage;
 	private boolean isClickedImageEffectOver;
 	private Timer timer;
-	private float alpha2 = 1f;
+	private float alpha2 = 1.0f;
 	/**
 	 * Svaki krug od kad je pokrenuta animacija za kliknutu sliku se ovaj brojac
 	 * povecava i kada dodje do 20 prekida se stanje te animacije
@@ -86,6 +86,7 @@ public class MainFrame extends GameFrame {
 	private int bunnyDancingCounter;
 	private int fontX = 50;
 	private boolean fontXBool;
+	private int fontPos;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
@@ -218,7 +219,7 @@ public class MainFrame extends GameFrame {
 							secondFallCords.setX(drugaOtvorenaSlika.getKoordinate().getX() + 200);
 							secondFallCords.setY(drugaOtvorenaSlika.getKoordinate().getY() + 100);
 							pogodjenPar = true;
-
+							animate++;
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
 									prvaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
@@ -330,7 +331,7 @@ public class MainFrame extends GameFrame {
 			g.setColor(Constants.colors[color]);
 			g.setFont(new Font("Algerian", Font.BOLD, fontX));
 
-			g.drawString("Èestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
+			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
 			g.drawImage(Util.loadImage("bunnyDancing/bunnyDancing" + (bunnyDancingCounter + 1) + ".png"), 350, 450,
 					null);
 			AffineTransform transform = new AffineTransform();
@@ -374,13 +375,13 @@ public class MainFrame extends GameFrame {
 	@Override
 	public void update() {
 
-		congratsStringCords.setY(getY() + 300);
 		if (fontXBool) {
 			fontX++;
-			congratsStringCords.setX(getX() - fontX + 375);
+			congratsStringCords.setX(congratsStringCords.getX());
+
 		} else {
 			fontX--;
-			congratsStringCords.setX(getX() - fontX + 375);
+			congratsStringCords.setX(congratsStringCords.getX());
 		}
 		if (fontX > 99) {
 			fontX = 100;
@@ -390,8 +391,8 @@ public class MainFrame extends GameFrame {
 			fontXBool = true;
 		}
 
-		congratsStringCords.setX(getX() + 150);
-		congratsStringCords.setY(getY() + 300);
+		// congratsStringCords.setX(getX() + 150);
+		// congratsStringCords.setY(getY() + 300);
 
 		composite -= 0.005;
 		if (composite < 0.0f) {
@@ -468,14 +469,18 @@ public class MainFrame extends GameFrame {
 			state = "Game";
 			bugsBunnyFalling = 0;
 		}
-		if (pogodjenPar && otvoreneSlike == 2) {
-			// bouncingImage();
-			alpha2 += -0.01f;
-			if (alpha2 <= 0) {
-				alpha2 = 0;
-				timer.stop();
+		if (pogodjenPar) {
+
+			if (animate % 2 == 0) {
+				alpha2 += -0.01f;
+				if (alpha2 <= 0) {
+					alpha2 = 1.0f;
+					timer.stop();
+				}
+				fadeOutImage(timer);
+			} else {
+				bouncingImage();
 			}
-			fadeOutImage(timer);
 		}
 
 		if (true) {
@@ -675,7 +680,7 @@ public class MainFrame extends GameFrame {
 		clickedImage = null;
 		isClickedImageEffectOver = false;
 		clickedImageCounter = 0;
-		congratsStringCords = new Koordinate(150, 150);
+		congratsStringCords = new Koordinate(350, 250);
 		raster = Util.createRaster(600, 600, false);
 		vx = Math.random() * 50;
 		vy = 0;
@@ -715,6 +720,7 @@ public class MainFrame extends GameFrame {
 		composite = 1.0f;
 		bunnyDancingCounter = 0;
 		timer = new Timer(20, null);
+		fontPos = 0;
 
 	}
 
