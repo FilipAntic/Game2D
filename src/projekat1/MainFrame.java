@@ -373,13 +373,17 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void update() {
+
+		congratsStringCords.setY(getY() + 300);
 		if (fontXBool) {
 			fontX++;
+			congratsStringCords.setX(getX() - fontX + 375);
 		} else {
 			fontX--;
+			congratsStringCords.setX(getX() - fontX + 375);
 		}
-		if (fontX > 129) {
-			fontX = 130;
+		if (fontX > 99) {
+			fontX = 100;
 			fontXBool = false;
 		} else if (fontX < 51) {
 			fontX = 50;
