@@ -367,21 +367,21 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void update() {
+		congratsStringCords.setY(getY() + 300);
 		if (fontXBool) {
 			fontX++;
+			congratsStringCords.setX(getX() - fontX + 375);
 		} else {
 			fontX--;
+			congratsStringCords.setX(getX() - fontX + 375);
 		}
-		if (fontX > 129) {
-			fontX = 130;
+		if (fontX > 99) {
+			fontX = 100;
 			fontXBool = false;
 		} else if (fontX < 51) {
 			fontX = 50;
 			fontXBool = true;
 		}
-
-		congratsStringCords.setX(getX()+150);
-		congratsStringCords.setY(getY()+300);
 
 		composite -= 0.005;
 		if (composite < 0.0f) {
