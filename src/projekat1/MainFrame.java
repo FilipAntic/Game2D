@@ -80,6 +80,7 @@ public class MainFrame extends GameFrame {
 	private float composite;
 	private int bunnyDancingCounter;
 	private int fontX = 50;
+	private boolean fontXBool;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
@@ -366,12 +367,21 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void update() {
-		fontX++;
-		if(fontX>130) {
-			fontX=50;
+		if (fontXBool) {
+			fontX++;
+		} else {
+			fontX--;
 		}
+		if (fontX > 129) {
+			fontX = 130;
+			fontXBool = false;
+		} else if (fontX < 51) {
+			fontX = 50;
+			fontXBool = true;
+		}
+
 		congratsStringCords.setX(getX()+150);
-		congratsStringCords.setY(getY()+270);
+		congratsStringCords.setY(getY()+300);
 
 		composite -= 0.005;
 		if (composite < 0.0f) {
@@ -685,6 +695,7 @@ public class MainFrame extends GameFrame {
 		noiseImageCounter = 1;
 		fillMap();
 		noiseUp = true;
+		fontXBool = false;
 		composite = 1.0f;
 		bunnyDancingCounter = 0;
 
