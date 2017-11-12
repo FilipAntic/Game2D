@@ -50,6 +50,7 @@ public class MainFrame extends GameFrame {
 	private int snoozingColor;
 	private WritableRaster raster;
 	private BufferedImage image;
+	private BufferedImage noiseImage;
 	private int color;
 	private boolean isFinishedGame;
 	private MemoryImage prvaOtvorenaSlika;
@@ -70,7 +71,10 @@ public class MainFrame extends GameFrame {
 	private String bugsBunnySide;
 	private String bugsBunnyImageName;
 	private int bugsBunnyFalling;
-	private boolean isQuit;
+	private int confettiDestY;
+	private int confettiMatrixH;
+	private int noiseImageCounter;
+	private boolean noiseUp;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
@@ -164,9 +168,9 @@ public class MainFrame extends GameFrame {
 					if (otvoreneSlike == 3) {
 						if (pogodjenPar) {
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
-									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									prvaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
-									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									drugaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							orderedImages.get(prvaOtvorenaSlikaInt).setOpened(true);
 							orderedImages.get(drugaOtvorenaSlikaInt).setOpened(true);
 							pogodjenPar = false;
@@ -208,9 +212,9 @@ public class MainFrame extends GameFrame {
 						if (countPogodjenPar == 8) {
 							System.out.println("Presao si igricu matori");
 							drawSpecificCords(prvaOtvorenaSlika.getKoordinate().getX(),
-									prvaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									prvaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							drawSpecificCords(drugaOtvorenaSlika.getKoordinate().getX(),
-									drugaOtvorenaSlika.getKoordinate().getY(), "rgb", "money");
+									drugaOtvorenaSlika.getKoordinate().getY(), "background", "map");
 							isFinishedGame = true;
 							genEx(500, 400, 3.0f, 200, 2);
 						}
@@ -260,10 +264,8 @@ public class MainFrame extends GameFrame {
 			int x = (sirinaEkrana - 600) / 2;
 			int y = (visinaEkrana - 600) / 2;
 
-			// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-			for (int i = 0; i <= x; i++) {
+			g.drawImage(imageMap.get("noise" + noiseImageCounter), 0, 0, null);
 
-			}
 			if (startingGame) {
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -341,16 +343,25 @@ public class MainFrame extends GameFrame {
 			// g.setFont(new Font("Algerian", Font.BOLD, 110));
 			// g.drawString("Cestitamo!", congratsStringCords.getX(),
 			// congratsStringCords.getY());
-			g.drawImage(Util.loadImage("particles/particles.jpg"), 100, 100, 100 + 152 / 2, 100 + 331 / 5, 2 * 152 / 2,
-					2 * 331 / 5, 2 * 152 / 2 + 152 / 2, 2 * 331 / 5 + 331 / 5, null);
+			for (int i = 0; i < 20; i++) {
+				g.drawImage(imageMap.get("particles" + i), randomInt(1000), randomInt(800), null);
+			}
 			break;
 		}
-
 	}
 
 	@Override
 	public void update() {
-
+		if (state.equals("Postintro")) {
+			confettiDestY += 10;
+			confettiMatrixH += 1;
+			if (confettiMatrixH > 5) {
+				confettiMatrixH = 0;
+			}
+			if (confettiDestY > 900) {
+				confettiDestY = 0;
+			}
+		}
 		if (isFinishedGame) {
 			state = "Postintro";
 			if (snoozingColor == 21) {
@@ -390,6 +401,7 @@ public class MainFrame extends GameFrame {
 			bugsBunnyFalling += 20;
 		}
 		if (bugsBunnyFalling >= 900) {
+			sleep(1000);
 			System.exit(0);
 		}
 
@@ -430,6 +442,18 @@ public class MainFrame extends GameFrame {
 
 		if (state.equals("Game")) {
 			alpha += 0.03f;
+			if (noiseUp) {
+				noiseImageCounter++;
+			} else {
+				noiseImageCounter--;
+			}
+			if (noiseImageCounter > 50) {
+				noiseImageCounter = 50;
+				noiseUp = false;
+			} else if (noiseImageCounter < 1) {
+				noiseImageCounter = 1;
+				noiseUp = true;
+			}
 		}
 		if (alpha >= 1.0f) {
 			alpha = 1.0f;
@@ -500,6 +524,16 @@ public class MainFrame extends GameFrame {
 		case "cover":
 			source = imageMap.get("cover").getRaster();
 			break;
+		case "background":
+			source = imageMap.get("map").getRaster();
+			for (int y1 = specificY; y1 < specificY + 150; y1++) {
+				for (int x1 = specificX; x1 < specificX + 150; x1++) {
+					source.getPixel(x1, y1, rgb);
+					raster.setPixel(x1, y1, rgb);
+				}
+			}
+			return;
+
 		}
 		for (int y1 = specificY; y1 < specificY + 150; y1++) {
 			for (int x1 = specificX; x1 < specificX + 150; x1++) {
@@ -607,15 +641,20 @@ public class MainFrame extends GameFrame {
 		startingGame = true;
 		arrowY = 50;
 		arrowGoingUp = false;
-		state = "Postintro";
+		state = "Game";
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
-		isQuit = false;
+		confettiDestY = 0;
+		confettiMatrixH = 0;
+		noiseImageCounter = 1;
+		noiseImageCounter = 1;
 		fillMap();
+		noiseUp = true;
 	}
 
 	public void fillMap() {
+		BufferedImage mapImage = Util.loadImage("map.jpg");
 		BufferedImage coverImage = loadImage("slika.png");
 		BufferedImage crocodileImage = loadImage("crocodile.jpg");
 		BufferedImage eagleImage = loadImage("eagle.jpg");
@@ -626,6 +665,7 @@ public class MainFrame extends GameFrame {
 		BufferedImage monkeyImage = loadImage("monkey.jpeg");
 		BufferedImage snakeImage = loadImage("snake.jpg");
 		BufferedImage moneyImage = loadImage("money.jpg");
+		imageMap.put("map", mapImage);
 		imageMap.put("cover", coverImage);
 		imageMap.put("crocodile", crocodileImage);
 		imageMap.put("eagle", eagleImage);
@@ -636,6 +676,10 @@ public class MainFrame extends GameFrame {
 		imageMap.put("monkey", monkeyImage);
 		imageMap.put("snake", snakeImage);
 		imageMap.put("money", moneyImage);
+		for (int counter = 1; counter < 51; counter++) {
+			imageMap.put("noise" + counter, Util.loadImage("noise" + counter + ".png"));
+		}
+
 	}
 
 	private void genEx(float cX, float cY, float radius, int life, int count) {
@@ -658,5 +702,10 @@ public class MainFrame extends GameFrame {
 					return;
 			}
 		}
+	}
+
+	public int randomInt(int range) {
+		Random rand = new Random();
+		return rand.nextInt(range);
 	}
 }
