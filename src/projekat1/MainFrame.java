@@ -321,7 +321,7 @@ public class MainFrame extends GameFrame {
 			g.setColor(Constants.colors[color]);
 			g.setFont(new Font("Algerian", Font.BOLD, 110));
 			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
-			g.drawImage(Util.loadImage("bunnyDancing/bunnyDancing" + (bunnyDancingCounter + 1) + ".png"), 600, 500,
+			g.drawImage(Util.loadImage("bunnyDancing/bunnyDancing" + (bunnyDancingCounter + 1) + ".png"), 350, 450,
 					null);
 			AffineTransform transform = new AffineTransform();
 			int i = 0;
