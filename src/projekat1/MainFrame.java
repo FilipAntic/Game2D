@@ -3,6 +3,7 @@ package projekat1;
 import java.awt.AlphaComposite;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
@@ -78,6 +79,7 @@ public class MainFrame extends GameFrame {
 	private int counterForPostIntro;
 	private float composite;
 	private int bunnyDancingCounter;
+	private int fontX = 50;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
@@ -319,8 +321,9 @@ public class MainFrame extends GameFrame {
 		case "Postintro":
 			g.drawImage(Util.loadImage("pozornica.jpg"), 0, 0, null);
 			g.setColor(Constants.colors[color]);
-			g.setFont(new Font("Algerian", Font.BOLD, 110));
-			g.drawString("Cestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
+			g.setFont(new Font("Algerian", Font.BOLD, fontX));
+
+			g.drawString("Èestitamo!", congratsStringCords.getX(), congratsStringCords.getY());
 			g.drawImage(Util.loadImage("bunnyDancing/bunnyDancing" + (bunnyDancingCounter + 1) + ".png"), 350, 450,
 					null);
 			AffineTransform transform = new AffineTransform();
@@ -363,6 +366,13 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void update() {
+		fontX++;
+		if(fontX>130) {
+			fontX=50;
+		}
+		congratsStringCords.setX(getX()+150);
+		congratsStringCords.setY(getY()+270);
+
 		composite -= 0.005;
 		if (composite < 0.0f) {
 			composite = 0;
@@ -481,6 +491,7 @@ public class MainFrame extends GameFrame {
 			startingGame = false;
 		}
 		genEx(randomInt(1000), randomInt(800), 3.0f, 200, 20);
+
 	}
 
 	public void sleep(int sleep) {
@@ -676,6 +687,7 @@ public class MainFrame extends GameFrame {
 		noiseUp = true;
 		composite = 1.0f;
 		bunnyDancingCounter = 0;
+
 	}
 
 	public void fillMap() {
