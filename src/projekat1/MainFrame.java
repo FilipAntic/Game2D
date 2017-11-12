@@ -372,6 +372,7 @@ public class MainFrame extends GameFrame {
 
 	@Override
 	public void update() {
+		
 		congratsStringCords.setY(getY() + 300);
 		if (fontXBool) {
 			fontX++;
