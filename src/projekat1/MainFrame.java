@@ -71,7 +71,8 @@ public class MainFrame extends GameFrame {
 	private String bugsBunnySide;
 	private String bugsBunnyImageName;
 	private int bugsBunnyFalling;
-	private boolean isQuit;
+	private int confettiDestY;
+	private int confettiMatrixH;
 	private int noiseImageCounter;
 	private boolean noiseUp;
 
@@ -342,16 +343,25 @@ public class MainFrame extends GameFrame {
 			// g.setFont(new Font("Algerian", Font.BOLD, 110));
 			// g.drawString("Cestitamo!", congratsStringCords.getX(),
 			// congratsStringCords.getY());
-			g.drawImage(Util.loadImage("particles/particles.jpg"), 100, 100, 100 + 152 / 2, 100 + 331 / 5, 2 * 152 / 2,
-					2 * 331 / 5, 2 * 152 / 2 + 152 / 2, 2 * 331 / 5 + 331 / 5, null);
+			for (int i = 0; i < 20; i++) {
+				g.drawImage(imageMap.get("particles" + i), randomInt(1000), randomInt(800), null);
+			}
 			break;
 		}
-
 	}
 
 	@Override
 	public void update() {
-
+		if (state.equals("Postintro")) {
+			confettiDestY += 10;
+			confettiMatrixH += 1;
+			if (confettiMatrixH > 5) {
+				confettiMatrixH = 0;
+			}
+			if (confettiDestY > 900) {
+				confettiDestY = 0;
+			}
+		}
 		if (isFinishedGame) {
 			state = "Postintro";
 			if (snoozingColor == 21) {
@@ -391,6 +401,7 @@ public class MainFrame extends GameFrame {
 			bugsBunnyFalling += 20;
 		}
 		if (bugsBunnyFalling >= 900) {
+			sleep(1000);
 			System.exit(0);
 		}
 
@@ -634,7 +645,9 @@ public class MainFrame extends GameFrame {
 		bugsBunnyImage = 1;
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
-		isQuit = false;
+		confettiDestY = 0;
+		confettiMatrixH = 0;
+		noiseImageCounter = 1;
 		noiseImageCounter = 1;
 		fillMap();
 		noiseUp = true;
@@ -689,5 +702,10 @@ public class MainFrame extends GameFrame {
 					return;
 			}
 		}
+	}
+
+	public int randomInt(int range) {
+		Random rand = new Random();
+		return rand.nextInt(range);
 	}
 }
