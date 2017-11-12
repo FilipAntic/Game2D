@@ -50,6 +50,7 @@ public class MainFrame extends GameFrame {
 	private int snoozingColor;
 	private WritableRaster raster;
 	private BufferedImage image;
+	private BufferedImage noiseImage;
 	private int color;
 	private boolean isFinishedGame;
 	private MemoryImage prvaOtvorenaSlika;
@@ -71,6 +72,8 @@ public class MainFrame extends GameFrame {
 	private String bugsBunnyImageName;
 	private int bugsBunnyFalling;
 	private boolean isQuit;
+	private int noiseImageCounter;
+	private boolean noiseUp;
 
 	public MainFrame() {
 		super("Projekat1 - Igra memorije", 1000, 800);
@@ -260,10 +263,8 @@ public class MainFrame extends GameFrame {
 			int x = (sirinaEkrana - 600) / 2;
 			int y = (visinaEkrana - 600) / 2;
 
-			// g.drawImage(Ilustrator.noiseGenerator(), 0, 0, null);
-			for (int i = 0; i <= x; i++) {
+			g.drawImage(imageMap.get("noise" + noiseImageCounter), 0, 0, null);
 
-			}
 			if (startingGame) {
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -430,6 +431,18 @@ public class MainFrame extends GameFrame {
 
 		if (state.equals("Game")) {
 			alpha += 0.03f;
+			if (noiseUp) {
+				noiseImageCounter++;
+			} else {
+				noiseImageCounter--;
+			}
+			if (noiseImageCounter > 50) {
+				noiseImageCounter = 50;
+				noiseUp = false;
+			} else if (noiseImageCounter < 1) {
+				noiseImageCounter = 1;
+				noiseUp = true;
+			}
 		}
 		if (alpha >= 1.0f) {
 			alpha = 1.0f;
@@ -622,7 +635,9 @@ public class MainFrame extends GameFrame {
 		bugsBunnySide = "right";
 		bugsBunnyFalling = 400;
 		isQuit = false;
+		noiseImageCounter = 1;
 		fillMap();
+		noiseUp = true;
 	}
 
 	public void fillMap() {
@@ -648,6 +663,10 @@ public class MainFrame extends GameFrame {
 		imageMap.put("monkey", monkeyImage);
 		imageMap.put("snake", snakeImage);
 		imageMap.put("money", moneyImage);
+		for (int counter = 1; counter < 51; counter++) {
+			imageMap.put("noise" + counter, Util.loadImage("noise" + counter + ".png"));
+		}
+
 	}
 
 	private void genEx(float cX, float cY, float radius, int life, int count) {
